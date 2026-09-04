@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AlertTriangle, Check, Copy, LoaderCircle, MessageSquareText } from 'lucide-react'
 import { api } from '../api/client'
+import ListenButton from './ListenButton'
 import { useAuth } from '../context/AuthContext'
 
 const TONE_STYLES = {
@@ -118,11 +119,14 @@ export default function PaymentReminders({ refreshKey }) {
                     {reminder.days_outstanding !== null ? ` · ${reminder.days_outstanding} days` : ''}
                   </span>
                 </div>
-                <button type="button" className="secondary-button !min-h-10 !px-4 !text-xs" onClick={() => copyMessage(reminder)}>
-                  {copied === reminder.name
-                    ? <><Check size={14} /> Copied</>
-                    : <><Copy size={14} /> Copy message</>}
-                </button>
+                <div className="flex shrink-0 gap-2">
+                  {language === 'urdu' && <ListenButton text={reminder.message_urdu} label="Sunein" />}
+                  <button type="button" className="secondary-button !min-h-10 !px-4 !text-xs" onClick={() => copyMessage(reminder)}>
+                    {copied === reminder.name
+                      ? <><Check size={14} /> Copied</>
+                      : <><Copy size={14} /> Copy message</>}
+                  </button>
+                </div>
               </div>
 
               <p

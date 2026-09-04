@@ -49,6 +49,12 @@ export const api = {
   customers: (token) => request('/customers', { token }),
   reminders: (token) => request('/reminders', { token }),
   readiness: (token) => request('/readiness', { token }),
+  review: (token) => request('/review', { token }),
+  correctTransaction: (token, id, patch) => request(`/transactions/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    token,
+    body: patch,
+  }),
   summary: (token, period = 'month') => request(`/summary?period=${encodeURIComponent(period)}`, { token }),
   transactions: (token, type = '') => request(`/transactions${type ? `?type=${encodeURIComponent(type)}` : ''}`, { token }),
   upload: (token, file) => {

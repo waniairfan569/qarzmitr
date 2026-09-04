@@ -13,7 +13,7 @@ app.disable('x-powered-by');
 app.use(express.json({ limit: '1mb' }));
 app.use(cors({
   origin: env.frontendOrigin,
-  methods: ['GET', 'POST', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 

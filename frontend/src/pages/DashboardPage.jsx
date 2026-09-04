@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, BarChart3, CalendarRange, Landmark, ListChecks, LoaderCircle, MessageSquareText, RefreshCw, Users, WalletCards } from 'lucide-react'
+import { AlertTriangle, BarChart3, CalendarRange, ClipboardCheck, Landmark, ListChecks, LoaderCircle, MessageSquareText, RefreshCw, Users, WalletCards } from 'lucide-react'
 import { api } from '../api/client'
 import AppShell from '../components/AppShell'
 import CustomerBalances from '../components/CustomerBalances'
 import LedgerWorkflow from '../components/LedgerWorkflow'
+import ListenButton from '../components/ListenButton'
 import LoanReadiness from '../components/LoanReadiness'
 import PaymentReminders from '../components/PaymentReminders'
 import PeriodHistory from '../components/PeriodHistory'
+import ReviewQueue from '../components/ReviewQueue'
 import ScoreCard from '../components/ScoreCard'
 import ScoreChart from '../components/ScoreChart'
 import TransactionTable from '../components/TransactionTable'
@@ -19,6 +21,7 @@ const TABS = [
   { id: 'udhaar', label: 'Udhaar book', icon: Users },
   { id: 'reminders', label: 'Reminders', icon: MessageSquareText },
   { id: 'history', label: 'History', icon: CalendarRange },
+  { id: 'review', label: 'To check', icon: ClipboardCheck },
   { id: 'transactions', label: 'Transactions', icon: ListChecks },
 ]
 
@@ -120,8 +123,14 @@ export default function DashboardPage() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
         <section className="card p-6 md:p-8">
-          <div className="section-kicker">In your own words</div>
-          <h2 className="mt-2 font-display text-3xl">What your score means</h2>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="section-kicker">In your own words</div>
+              <h2 className="mt-2 font-display text-3xl">What your score means</h2>
+            </div>
+            {/* Hides itself when the device has no Urdu voice installed. */}
+            <ListenButton text={dashboard.latestScore?.explanation_text} label="Sunein" />
+          </div>
           <div className="mt-5 rounded-2xl border-s-4 border-saffron bg-saffron/[0.08] p-6">
             <p className="urdu-text text-xl leading-[2.1] text-ink" dir="rtl" lang="ur">
               {dashboard.latestScore?.explanation_text || 'Explanation not available yet'}
@@ -173,6 +182,9 @@ export default function DashboardPage() {
           </div>
           <div role="tabpanel" id="panel-history" aria-labelledby="tab-history" hidden={tab !== 'history'}>
             <PeriodHistory refreshKey={refreshKey} />
+          </div>
+          <div role="tabpanel" id="panel-review" aria-labelledby="tab-review" hidden={tab !== 'review'}>
+            <ReviewQueue refreshKey={refreshKey} onCorrected={loadDashboard} />
           </div>
           <div role="tabpanel" id="panel-transactions" aria-labelledby="tab-transactions" hidden={tab !== 'transactions'}>
             <TransactionTable transactions={transactions} filter={filter} onFilter={changeFilter} loading={transactionLoading} error={transactionError} />

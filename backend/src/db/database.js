@@ -85,6 +85,9 @@ function initializeDatabase() {
   `);
 
   addColumnIfMissing('transactions', 'note', 'TEXT');
+  // Set once a shopkeeper has confirmed or corrected a flagged row, so it stops
+  // appearing in the review queue.
+  addColumnIfMissing('transactions', 'reviewed_at', 'TEXT');
   // Google sign-in links an account to a Google subject id; local-only accounts leave it null.
   addColumnIfMissing('users', 'google_id', 'TEXT');
   // Bumped on password reset so tokens issued before the reset stop verifying.

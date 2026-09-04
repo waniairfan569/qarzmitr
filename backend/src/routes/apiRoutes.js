@@ -10,6 +10,7 @@ const {
 const { scoreUser } = require('../controllers/scoreController');
 const { structureLedger } = require('../controllers/structureController');
 const { uploadImage, uploadLedger } = require('../controllers/uploadController');
+const { getReview, updateTransaction } = require('../controllers/reviewController');
 const verifyToken = require('../middleware/verifyToken');
 
 const router = express.Router();
@@ -24,5 +25,7 @@ router.get('/customers', getCustomers);
 router.get('/readiness', getReadiness);
 router.get('/reminders', getReminders);
 router.get('/summary', getSummary);
+router.get('/review', getReview);
+router.patch('/transactions/:id', updateTransaction);
 
 module.exports = router;
