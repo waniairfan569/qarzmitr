@@ -128,7 +128,7 @@ export default function PeriodHistory({ refreshKey }) {
             </table>
           </div>
 
-          <p className="mt-5 flex items-start gap-2.5 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/55">
+          <p className="mt-5 flex items-start gap-2.5 max-w-3xl border-t border-ink/10 pt-5 text-xs leading-5 text-ink/55">
             <TrendingUp className="mt-0.5 shrink-0 text-leaf" size={15} />
             <span>
               {t(`hist.note`)}

@@ -84,7 +84,7 @@ export default function LoanReadiness({ refreshKey }) {
         </div>
       </div>
 
-      <p className="mt-6 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/50">
+      <p className="mt-6 max-w-3xl border-t border-ink/10 pt-5 text-xs leading-5 text-ink/50">
         {t(`ready.caveat`)}
       </p>
     </section>

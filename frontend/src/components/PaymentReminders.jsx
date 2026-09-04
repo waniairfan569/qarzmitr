@@ -139,7 +139,7 @@ export default function PaymentReminders({ refreshKey }) {
         </ul>
       )}
 
-      <p className="mt-6 flex items-start gap-2.5 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/55">
+      <p className="mt-6 flex items-start gap-2.5 max-w-3xl border-t border-ink/10 pt-5 text-xs leading-5 text-ink/55">
         <MessageSquareText className="mt-0.5 shrink-0 text-saffron-dark" size={15} />
         {t(`rem.note`)}
       </p>

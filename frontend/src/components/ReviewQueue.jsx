@@ -178,7 +178,7 @@ export default function ReviewQueue({ refreshKey, onCorrected }) {
         </ul>
       )}
 
-      <p className="mt-6 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/55">
+      <p className="mt-6 max-w-3xl border-t border-ink/10 pt-5 text-xs leading-5 text-ink/55">
         {t(`rev.note`)}
       </p>
     </section>
