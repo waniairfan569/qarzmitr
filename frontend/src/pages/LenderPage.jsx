@@ -4,7 +4,7 @@ import { AlertTriangle, ArrowLeft, Download, FileText, LoaderCircle, TrendingDow
 import { api } from '../api/client'
 import AppShell from '../components/AppShell'
 import { useAuth } from '../context/AuthContext'
-import { useT } from '../i18n'
+import { useMoney, useT } from '../i18n'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
@@ -20,10 +20,6 @@ function statementReference(latestScore) {
   const id = String(latestScore?.id || '').replace(/-/g, '').slice(0, 8).toUpperCase()
   const day = String(latestScore?.computed_at || '').slice(0, 10).replace(/-/g, '')
   return `QM-${day}-${id || 'PENDING'}`
-}
-
-function pkr(amount) {
-  return `PKR ${Math.round(amount).toLocaleString('en-PK')}`
 }
 
 function sumBy(transactions, type) {
@@ -76,6 +72,7 @@ function buildAssessment(transactions, latestScore, scoreHistory) {
 export default function LenderPage() {
   const { token, user, logout } = useAuth()
   const t = useT()
+  const pkr = useMoney()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')

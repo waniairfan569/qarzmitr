@@ -1,17 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AlertTriangle, CalendarRange, LoaderCircle, TrendingUp } from 'lucide-react'
 import { api } from '../api/client'
-import { useT } from '../i18n'
+import { useMoney, useT } from '../i18n'
 import { useAuth } from '../context/AuthContext'
 
 const PERIODS = [{ id: 'day' }, { id: 'week' }, { id: 'month' }, { id: 'year' }]
 
-function pkr(amount) {
-  return Number(amount || 0).toLocaleString('en-PK')
-}
-
 export default function PeriodHistory({ refreshKey }) {
   const t = useT()
+  const pkr = useMoney()
   const { token } = useAuth()
   const [period, setPeriod] = useState('week')
   const [data, setData] = useState(null)
@@ -88,8 +85,8 @@ export default function PeriodHistory({ refreshKey }) {
       {data && periods.length > 0 && (
         <>
           <div className="mt-7 grid gap-3 sm:grid-cols-3">
-            <Tile label={t(`hist.totalSales`)} value={`PKR ${pkr(data.totals.sales)}`} />
-            <Tile label={t(`hist.average`, { period: t(`hist.${period}`) })} value={`PKR ${pkr(data.average_net)}`} />
+            <Tile label={t(`hist.totalSales`)} value={pkr(data.totals.sales)} />
+            <Tile label={t(`hist.average`, { period: t(`hist.${period}`) })} value={pkr(data.average_net)} />
             <Tile label={t(`hist.best`)} value={data.best_period?.label || '—'} sub={data.best_period ? t(`hist.netLabel`, { net: pkr(data.best_period.net) }) : ''} />
           </div>
 

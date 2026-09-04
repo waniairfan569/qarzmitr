@@ -1,9 +1,5 @@
 import { AlertTriangle, CheckCircle2, HandCoins, LoaderCircle, Users } from 'lucide-react'
-import { useT } from '../i18n'
-
-function pkr(amount) {
-  return Number(amount || 0).toLocaleString('en-PK')
-}
+import { useMoney, useT } from '../i18n'
 
 // A debt is only worth chasing once it has been sitting a while; two weeks is
 // the point most shopkeepers start asking.
@@ -16,6 +12,7 @@ function ageTone(days) {
 
 export default function CustomerBalances({ data, loading, error }) {
   const t = useT()
+  const pkr = useMoney()
   if (loading) {
     return (
       <section className="card p-6 md:p-8">
@@ -44,7 +41,7 @@ export default function CustomerBalances({ data, loading, error }) {
         {summary && (
           <div className="rounded-2xl bg-ink/[0.05] px-5 py-4 text-end">
             <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/50">{t(`udhaar.totalOutstanding`)}</span>
-            <strong className="mt-1 block font-display text-3xl tabular-nums text-ink">PKR {pkr(summary.total_outstanding)}</strong>
+            <strong className="mt-1 block font-display text-3xl tabular-nums text-ink">{pkr(summary.total_outstanding)}</strong>
             <span className="mt-1 block text-xs text-ink/55">
               {t(`udhaar.across`, { count: summary.customers_owing })}
             </span>
@@ -89,7 +86,7 @@ export default function CustomerBalances({ data, loading, error }) {
                   </span>
                 )}
                 <div className="text-end">
-                  <strong className="block font-display text-2xl tabular-nums text-ink">PKR {pkr(customer.outstanding)}</strong>
+                  <strong className="block font-display text-2xl tabular-nums text-ink">{pkr(customer.outstanding)}</strong>
                   <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/45">{t(`udhaar.outstanding`)}</span>
                 </div>
               </div>

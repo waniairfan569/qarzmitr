@@ -3,17 +3,14 @@ import { ArrowRight, Banknote, CircleCheck, Download, Target } from 'lucide-reac
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
 import { useAuth } from '../context/AuthContext'
-import { useT } from '../i18n'
+import { useMoney, useT } from '../i18n'
 
 const leverKey = (key) => ({ cash_flow_consistency: `cashflow`, repayment_ratio: `repayment`, revenue_trend: `revenue` })[key] || key
-
-function pkr(amount) {
-  return Number(amount || 0).toLocaleString('en-PK')
-}
 
 export default function LoanReadiness({ refreshKey }) {
   const { token } = useAuth()
   const t = useT()
+  const pkr = useMoney()
   const [data, setData] = useState(null)
 
   const load = useCallback(async () => {

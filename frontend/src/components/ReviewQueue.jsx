@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AlertTriangle, Check, CircleCheck, LoaderCircle, PencilLine } from 'lucide-react'
 import { api } from '../api/client'
-import { useT } from '../i18n'
+import { useMoney, useT } from '../i18n'
 import { useAuth } from '../context/AuthContext'
 
 const TYPES = [{ id: 'sale' }, { id: 'expense' }, { id: 'credit_given' }, { id: 'repayment' }]
@@ -14,6 +14,7 @@ const SEVERITY_CHIP = {
 
 export default function ReviewQueue({ refreshKey, onCorrected }) {
   const t = useT()
+  const money = useMoney()
   const { token } = useAuth()
   const [queue, setQueue] = useState(null)
   const [editing, setEditing] = useState(null)
@@ -111,7 +112,7 @@ export default function ReviewQueue({ refreshKey, onCorrected }) {
                     <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${SEVERITY_CHIP[item.severity]}`}>
                       {t(`rev.sev.${item.severity}`)}
                     </span>
-                    <strong className="text-base text-ink">PKR {Number(item.amount || 0).toLocaleString('en-PK')}</strong>
+                    <strong className="text-base text-ink">{money(item.amount)}</strong>
                     <span className="text-xs text-ink/50">
                       {t(`type.${item.type}`)} · {item.transaction_date || t(`rev.sev.low`)}{item.customer_name ? ` · ${item.customer_name}` : ''}
                     </span>

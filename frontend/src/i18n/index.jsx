@@ -69,3 +69,19 @@ export function useLanguage() {
 export function useT() {
   return useLanguage().t
 }
+
+/**
+ * Formats an amount with the currency written the way the current language
+ * writes it. Kept here rather than in each component so a translated string
+ * never has to carry a currency of its own — that is how "PKR PKR 93,390"
+ * happened.
+ */
+export function useMoney() {
+  const { isUrdu } = useLanguage()
+
+  return useCallback((amount) => {
+    const number = Number(amount || 0)
+    const formatted = Math.round(number).toLocaleString('en-PK')
+    return isUrdu ? `${formatted} روپے` : `PKR ${formatted}`
+  }, [isUrdu])
+}

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AlertTriangle, Check, Copy, LoaderCircle, MessageSquareText } from 'lucide-react'
 import { api } from '../api/client'
-import { useT } from '../i18n'
+import { useMoney, useT } from '../i18n'
 import ListenButton from './ListenButton'
 import { useAuth } from '../context/AuthContext'
 
@@ -11,12 +11,9 @@ const TONE_STYLES = {
   urgent: 'bg-coral/10 text-coral',
 }
 
-function pkr(amount) {
-  return Number(amount || 0).toLocaleString('en-PK')
-}
-
 export default function PaymentReminders({ refreshKey }) {
   const t = useT()
+  const pkr = useMoney()
   const { token } = useAuth()
   const [reminders, setReminders] = useState([])
   const [language, setLanguage] = useState('urdu')
@@ -116,7 +113,7 @@ export default function PaymentReminders({ refreshKey }) {
                     {t(`rem.tone.${reminder.tone}`)}
                   </span>
                   <span className="text-xs text-ink/50">
-                    PKR {pkr(reminder.outstanding)}
+                    {pkr(reminder.outstanding)}
                     {reminder.days_outstanding !== null ? ` · ${t(`udhaar.days`, { days: reminder.days_outstanding })}` : ''}
                   </span>
                 </div>

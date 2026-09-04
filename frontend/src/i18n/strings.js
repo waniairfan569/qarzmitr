@@ -86,8 +86,8 @@ export const STRINGS = {
   'ready.eligibleTitle': ['A lender can act on this today', 'قرض دینے والا آج اس پر عمل کر سکتا ہے'],
   'ready.awayTitle': ['You are {points} point(s) away', 'آپ صرف {points} نمبر دور ہیں'],
   'ready.eligibleBody': [
-    'Your record is strong enough to put in front of a microfinance institution. On average monthly sales of PKR {sales}, that supports an indicative facility of about PKR {facility}.',
-    'آپ کا ریکارڈ اتنا مضبوط ہے کہ کسی مائیکرو فنانس ادارے کے سامنے رکھا جا سکے۔ ماہانہ اوسط فروخت {sales} روپے پر تقریباً {facility} روپے تک کی سہولت بنتی ہے۔'
+    'Your record is strong enough to put in front of a microfinance institution. On average monthly sales of {sales}, that supports an indicative facility of about {facility}.',
+    'آپ کا ریکارڈ اتنا مضبوط ہے کہ کسی مائیکرو فنانس ادارے کے سامنے رکھا جا سکے۔ ماہانہ اوسط فروخت {sales} پر تقریباً {facility} تک کی سہولت بنتی ہے۔'
   ],
   'ready.awayBody': [
     'At {at} out of 100 a microfinance institution can be asked to consider you. You are at {score}.',
@@ -178,7 +178,7 @@ export const STRINGS = {
   ],
   'udhaar.totalOutstanding': ['Total outstanding', 'کل باقی رقم'],
   'udhaar.across': ['across {count} customer(s)', '{count} گاہکوں سے'],
-  'udhaar.given': ['PKR {given} given · PKR {repaid} repaid', '{given} روپے دیے · {repaid} روپے واپس'],
+  'udhaar.given': ['{given} given · {repaid} repaid', '{given} دیے · {repaid} واپس'],
   'udhaar.last': ['last {date}', 'آخری {date}'],
   'udhaar.alias': ['also written as {names}', 'یہ نام یوں بھی لکھا گیا: {names}'],
   'udhaar.days': ['{days} days', '{days} دن'],
@@ -242,7 +242,7 @@ export const STRINGS = {
   'hist.totalSales': ['Total sales', 'کل فروخت'],
   'hist.average': ['Average per {period}', 'فی {period} اوسط'],
   'hist.best': ['Best period', 'بہترین مدت'],
-  'hist.netLabel': ['PKR {net} net', '{net} روپے خالص'],
+  'hist.netLabel': ['{net} net', '{net} خالص'],
   'hist.emptyTitle': ['Nothing dated yet', 'ابھی کوئی تاریخ درج نہیں'],
   'hist.emptyBody': [
     'Upload a ledger page with dates on it and your trading history will build up here.',
@@ -320,7 +320,7 @@ export const STRINGS = {
   'lender.since': ['{delta} since previous run', 'پچھلی بار سے {delta}'],
   'lender.recommendation': ['Recommendation', 'سفارش'],
   'lender.ceiling': ['Indicative facility ceiling', 'اندازاً زیادہ سے زیادہ سہولت'],
-  'lender.ceilingNote': ['{multiple}× average monthly sales of PKR {sales}, measured across {days} days of ledger evidence.', 'ماہانہ اوسط فروخت {sales} روپے کا {multiple} گنا، {days} دن کے کھاتے کے ثبوت پر۔'],
+  'lender.ceilingNote': ['{multiple}× average monthly sales of {sales}, measured across {days} days of ledger evidence.', 'ماہانہ اوسط فروخت {sales} کا {multiple} گنا، {days} دن کے کھاتے کے ثبوت پر۔'],
   'lender.band.recommended': ['Recommended', 'سفارش کی جاتی ہے'],
   'lender.band.review': ['Recommended with review', 'جانچ کے ساتھ سفارش'],
   'lender.band.manual': ['Refer for manual review', 'دستی جانچ کے لیے بھیجیں'],
