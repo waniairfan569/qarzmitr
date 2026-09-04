@@ -49,7 +49,7 @@ export default function LoginPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-sm font-bold text-ink"><KeyRound className="text-saffron-dark" size={17} /> {t(`auth.tryDemo`)}</div>
-            <p className="mt-1 text-xs leading-5 text-ink/55">Open the seeded shop record instantly.</p>
+            <p className="mt-1 text-xs leading-5 text-ink/55">{t(`auth.demoHint`)}</p>
           </div>
           <button className="shrink-0 rounded-lg border border-ink/15 bg-cream px-3 py-2 text-[11px] font-bold text-leaf transition hover:-translate-y-0.5 hover:border-leaf/40" type="button" onClick={fillDemoCredentials}>
             {t(`auth.fillDemo`)}

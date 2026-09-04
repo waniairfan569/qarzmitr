@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { AlertCircle, ArrowLeft, ArrowRight, LoaderCircle, MailCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import AuthFrame from '../components/AuthFrame'
+import { useT } from '../i18n'
 import { api } from '../api/client'
 
 export default function ForgotPasswordPage() {
+  const t = useT()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [sent, setSent] = useState(false)
@@ -56,7 +58,7 @@ export default function ForgotPasswordPage() {
     <AuthFrame eyebrow="Password reset" title="Let's get you back in." subtitle="Enter your email and we'll send a link to choose a new password.">
       <form className="space-y-5" onSubmit={submit} noValidate>
         <label className="block">
-          <span className="field-label">Email address</span>
+          <span className="field-label">{t(`auth.email`)}</span>
           <input
             className="input-field"
             type="email"

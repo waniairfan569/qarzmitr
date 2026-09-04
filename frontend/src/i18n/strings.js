@@ -369,6 +369,60 @@ export const STRINGS = {
   'lender.metric.repayment': ['Repayment ratio', 'واپسی کا تناسب'],
   'lender.metric.revenue': ['Revenue trend', 'فروخت کا رجحان'],
 
+  'chart.empty': ['Each scoring run will appear here.', 'ہر بار کا اسکور یہاں نظر آئے گا۔'],
+  'chart.oneRun': ['Compute another score later to reveal your trend.', 'بعد میں ایک اور اسکور نکالیں تو رجحان نظر آنے لگے گا۔'],
+  'auth.demoHint': ['Open the seeded shop record instantly.', 'نمونے کی دکان کا کھاتہ فوراً کھولیں۔'],
+  'auth.finishingGoogle': ['Finishing Google sign-in…', 'گوگل سے داخلہ مکمل ہو رہا ہے…'],
+
+  // ---- how it works ----
+  'how.eyebrow': ['Financial inclusion, page by page', 'مالی شمولیت، صفحہ بہ صفحہ'],
+  'how.headline': ['Paper ledgers → verifiable credit score.', 'کاغذی کھاتہ ← قابلِ تصدیق کریڈٹ اسکور۔'],
+  'how.noApp': ['No banking app required.', 'کسی بینکنگ ایپ کی ضرورت نہیں۔'],
+  'how.intro': [
+    'The financial data already exists on paper. QarzMitr reads, structures, and scores it—without changing how a shopkeeper works.',
+    'مالی معلومات پہلے سے کاغذ پر موجود ہیں۔ قرض متر انہیں پڑھتا، ترتیب دیتا اور اسکور بناتا ہے — دکاندار کے کام کرنے کا طریقہ بدلے بغیر۔'
+  ],
+  'how.stepsLabel': ['How it works · five clear steps', 'یہ کیسے کام کرتا ہے · پانچ صاف مرحلے'],
+  'how.step1': ['Secure account', 'محفوظ کھاتہ'],
+  'how.step1.body': [
+    'Sign up with an email or with Google; each shopkeeper’s ledger stays private to them.',
+    'ای میل یا گوگل سے کھاتہ بنائیں؛ ہر دکاندار کا کھاتہ صرف اُسی کا رہتا ہے۔'
+  ],
+  'how.step2': ['Snap your ledger', 'کھاتے کی تصویر لیں'],
+  'how.step2.body': [
+    'Upload a photo; Qwen-VL reads handwritten Urdu and English exactly as written.',
+    'تصویر بھیجیں؛ Qwen-VL ہاتھ کی لکھی اردو اور انگریزی جوں کی توں پڑھتا ہے۔'
+  ],
+  'how.step3': ['Auto-structure', 'خودکار ترتیب'],
+  'how.step3.body': [
+    'Qwen turns messy lines into clean sales, expenses, credit given, and repayments.',
+    'Qwen بکھری سطروں کو صاف فروخت، خرچ، ادھار اور واپسی میں بدل دیتا ہے۔'
+  ],
+  'how.step4': ['Credit score', 'کریڈٹ اسکور'],
+  'how.step4.body': [
+    'Transparent code calculates 0–100 from cash flow, repayment ratio, and revenue trend; AI only explains it in plain Urdu.',
+    'شفاف پروگرام نقد بہاؤ، واپسی کے تناسب اور فروخت کے رجحان سے ۰ تا ۱۰۰ اسکور نکالتا ہے؛ اے آئی صرف اسے سادہ اردو میں سمجھاتا ہے۔'
+  ],
+  'how.step5': ['Your dashboard', 'آپ کا کھاتہ'],
+  'how.step5.body': [
+    'Your score, the weeks it was measured on, how close a lender saying yes is — and a statement you can print and hand over.',
+    'آپ کا اسکور، وہ ہفتے جن پر یہ ناپا گیا، قرض کی منظوری کتنی قریب ہے — اور ایک اسٹیٹمنٹ جو چھاپ کر بینک کو دی جا سکے۔'
+  ],
+  'how.alsoLabel': ['What the same photo also gives you', 'وہی تصویر اور کیا دیتی ہے'],
+  'how.tool1': ['Udhaar book', 'ادھار کھاتہ'],
+  'how.tool1.body': ['Who owes you, what they have paid back, and how old the debt is.', 'کس نے دینا ہے، کتنا واپس کیا، اور ادھار کتنا پرانا ہے۔'],
+  'how.tool2': ['Ready reminders', 'تیار یاد دہانیاں'],
+  'how.tool2.body': ['A polite Urdu message for each customer who owes — copy it and send it.', 'ہر قرض دار گاہک کے لیے مؤدب اردو پیغام — نقل کریں اور بھیج دیں۔'],
+  'how.tool3': ['Trading history', 'کاروبار کی تاریخ'],
+  'how.tool3.body': ['Sales, expenses and net income by day, week, month or year.', 'فروخت، خرچ اور خالص آمدنی روزانہ، ہفتہ وار، ماہانہ یا سالانہ۔'],
+  'how.tool4': ['Entries to check', 'جانچنے والے اندراج'],
+  'how.tool4.body': ['Anything read uncertainly is listed for you to correct or confirm.', 'جو کچھ شک سے پڑھا جائے وہ درست کرنے یا تصدیق کے لیے سامنے رکھ دیا جاتا ہے۔'],
+  'how.trustLabel': ['Why trust this', 'اس پر بھروسہ کیوں'],
+  'how.trust1': ['Auditable code—not AI—calculates every score.', 'ہر اسکور قابلِ جانچ پروگرام نکالتا ہے، اے آئی نہیں۔'],
+  'how.trust2': ['Unclear readings are flagged, never hidden—and you can correct them.', 'مشکوک پڑھائی نشان زد ہوتی ہے، چھپائی نہیں جاتی — اور آپ اسے درست کر سکتے ہیں۔'],
+  'how.trust3': ['Your score explanation and reminders can be read aloud.', 'اسکور کی وضاحت اور یاد دہانیاں سنی بھی جا سکتی ہیں۔'],
+  'how.trust4': ['A lender view shows the same evidence, never a different answer.', 'قرض دینے والے کو وہی ثبوت دکھتا ہے، کوئی الگ جواب نہیں۔'],
+
   // ---- footer ----
   'footer.prototype': [
     'QarzMitr is a feasibility prototype, not a final lending decision.',

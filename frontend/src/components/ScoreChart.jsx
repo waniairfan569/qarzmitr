@@ -22,7 +22,7 @@ export default function ScoreChart({ scoreHistory }) {
       {data.length === 0 ? (
         <div className="grid h-[210px] place-content-center text-center">
           <p className="font-display text-2xl text-ink/35">The line begins after your first score.</p>
-          <p className="mt-2 text-sm text-ink/45">Each scoring run will appear here.</p>
+          <p className="mt-2 text-sm text-ink/45">{t(`chart.empty`)}</p>
         </div>
       ) : (
         <div className="mt-5 h-[220px] w-full">
@@ -41,7 +41,7 @@ export default function ScoreChart({ scoreHistory }) {
               <Area type="monotone" dataKey="score" stroke="#d98520" strokeWidth={3} fill="url(#scoreFill)" dot={{ r: 5, fill: '#fffaf0', stroke: '#d98520', strokeWidth: 3 }} activeDot={{ r: 7 }} />
             </AreaChart>
           </ResponsiveContainer>
-          {data.length === 1 && <p className="-mt-1 text-center text-xs text-ink/45">Compute another score later to reveal your trend.</p>}
+          {data.length === 1 && <p className="-mt-1 text-center text-xs text-ink/45">{t(`chart.oneRun`)}</p>}
         </div>
       )}
     </section>

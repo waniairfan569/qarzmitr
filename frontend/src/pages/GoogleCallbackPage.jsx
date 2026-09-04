@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useT } from '../i18n'
 
 // The backend redirects here with #token=… after Google approves the sign-in.
 // Reading it from the fragment keeps the token out of server logs and referrers.
@@ -11,6 +12,7 @@ function readTokenFromFragment() {
 }
 
 export default function GoogleCallbackPage() {
+  const t = useT()
   const { acceptToken, isAuthenticated } = useAuth()
   const [failed, setFailed] = useState(false)
 
@@ -35,7 +37,7 @@ export default function GoogleCallbackPage() {
   return (
     <div className="grid min-h-screen place-content-center bg-paper text-center text-ink">
       <LoaderCircle className="mx-auto animate-spin text-saffron" size={34} />
-      <p className="mt-4 text-sm font-bold">Finishing Google sign-in…</p>
+      <p className="mt-4 text-sm font-bold">{t(`auth.finishingGoogle`)}</p>
     </div>
   )
 }
