@@ -117,3 +117,39 @@ html[lang="ur"] h1, html[lang="ur"] h2 { line-height: 1.45; }
 @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes progress { from { transform: translateX(-120%); } to { transform: translateX(340%); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+
+/* ---------------------------------------------------------------------------
+   Printing the lender assessment.
+
+   A shopkeeper who reaches the threshold needs something to hand a lender, and
+   a screenshot is not that. The browser's own print dialog produces a PDF on
+   every device, including a phone, with no library and nothing to install.
+   Everything that belongs to the app rather than to the statement is dropped.
+   --------------------------------------------------------------------------- */
+@media print {
+  @page { margin: 14mm; }
+
+  html, body { background: #fff !important; }
+  .no-print, header.sticky, .paper-grid, .icon-button { display: none !important; }
+
+  /* Cards become plain ruled blocks: shadows and heavy fills waste toner and
+     make a printed page harder to read, not easier. */
+  .card {
+    border: 1px solid #c9c3b4 !important;
+    border-radius: .5rem !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    break-inside: avoid;
+  }
+  main { padding: 0 !important; max-width: none !important; }
+
+  .print-only { display: block !important; }
+  .print-block { break-inside: avoid; }
+  .print-break-before { break-before: page; }
+
+  /* The score, the band and the metric colours carry meaning, so keep them. */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  a[href]::after { content: ""; }
+}
+
+.print-only { display: none; }

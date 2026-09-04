@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ArrowRight, Banknote, CircleCheck, Target } from 'lucide-react'
+import { ArrowRight, Banknote, CircleCheck, Download, Target } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { api } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useT } from '../i18n'
@@ -63,6 +64,11 @@ export default function LoanReadiness({ refreshKey }) {
             <p className={`mt-3 inline-flex items-center gap-2 text-sm font-bold ${eligible ? 'text-leaf' : 'text-saffron-dark'}`}>
               {eligible ? <CircleCheck size={16} /> : <Target size={16} />} {t(`ready.band.${band.id}`)}
             </p>
+            {eligible && (
+              <Link className="secondary-button mt-4 !min-h-11 !px-5 !text-xs" to="/lender">
+                <Download size={15} /> {t(`ready.getStatement`)}
+              </Link>
+            )}
           </div>
         </div>
 

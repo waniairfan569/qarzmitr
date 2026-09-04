@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, ArrowLeft, FileText, LoaderCircle, TrendingDown, TrendingUp } from 'lucide-react'
+import { AlertTriangle, ArrowLeft, Download, FileText, LoaderCircle, TrendingDown, TrendingUp } from 'lucide-react'
 import { api } from '../api/client'
 import AppShell from '../components/AppShell'
 import { useAuth } from '../context/AuthContext'
@@ -15,6 +15,12 @@ const BANDS = [
   { min: 40, id: 'manual', multiple: 0, tone: 'text-saffron-dark' },
   { min: 0, id: 'none', multiple: 0, tone: 'text-coral' },
 ]
+
+function statementReference(latestScore) {
+  const id = String(latestScore?.id || '').replace(/-/g, '').slice(0, 8).toUpperCase()
+  const day = String(latestScore?.computed_at || '').slice(0, 10).replace(/-/g, '')
+  return `QM-${day}-${id || 'PENDING'}`
+}
 
 function pkr(amount) {
   return `PKR ${Math.round(amount).toLocaleString('en-PK')}`
@@ -62,7 +68,8 @@ function buildAssessment(transactions, latestScore, scoreHistory) {
     band,
     facility: monthlySales * band.multiple,
     delta,
-    customers: new Set(transactions.map((transaction) => transaction.customer_name).filter(Boolean)).size
+    customers: new Set(transactions.map((transaction) => transaction.customer_name).filter(Boolean)).size,
+    ledgerPages: new Set(transactions.map((transaction) => transaction.ledger_id).filter(Boolean)).size
   }
 }
 
@@ -106,15 +113,36 @@ export default function LenderPage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-5xl">
-        <Link className="text-button inline-flex items-center gap-2" to="/dashboard">
-          <ArrowLeft size={15} /> {t(`lender.back`)}
-        </Link>
+        <div className="no-print flex flex-wrap items-center justify-between gap-4">
+          <Link className="text-button inline-flex items-center gap-2" to="/dashboard">
+            <ArrowLeft size={15} /> {t(`lender.back`)}
+          </Link>
+          {data?.latestScore && (
+            <div className="text-end">
+              <button type="button" className="primary-button !min-h-11 !px-5 !text-xs" onClick={() => window.print()}>
+                <Download size={15} /> {t(`lender.download`)}
+              </button>
+              <p className="mt-1.5 max-w-xs text-xs leading-5 text-ink/50">{t(`lender.downloadHint`)}</p>
+            </div>
+          )}
+        </div>
 
         {error && (
           <div className="error-box mt-6" role="alert">
             <AlertTriangle size={17} /> {error}
           </div>
         )}
+
+        <div className="print-only print-block mb-5 border-b-2 border-ink pb-4">
+          <div className="flex items-baseline justify-between gap-6">
+            <strong className="font-display text-2xl">QarzMitr · {t(`lender.statement`)}</strong>
+            <span className="text-xs">{t(`lender.reference`)}: {statementReference(data?.latestScore)}</span>
+          </div>
+          <div className="mt-1 flex flex-wrap gap-x-6 text-xs text-ink/60">
+            <span>{t(`lender.generated`)}: {new Date().toLocaleString()}</span>
+            {assessment && <span>{t(`lender.pages`)}: {assessment.ledgerPages}</span>}
+          </div>
+        </div>
 
         <header className="mt-6">
           <div className="section-kicker">{t(`lender.kicker`)}</div>
@@ -204,6 +232,11 @@ export default function LenderPage() {
               </p>
               <p className="mt-4 rounded-2xl border-s-4 border-coral bg-coral/[0.07] p-5 text-sm leading-6 text-ink/70">
                 {t(`lender.caveat`)}
+              </p>
+              {/* Printed only: tells whoever receives the sheet what it is and
+                  how to quote it back. */}
+              <p className="print-only mt-4 border-t border-ink/20 pt-4 text-xs leading-5 text-ink/70">
+                {t(`lender.verify`)}
               </p>
             </section>
           </>

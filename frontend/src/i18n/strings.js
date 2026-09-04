@@ -98,6 +98,7 @@ export const STRINGS = {
   'ready.needed': ['{at} needed', '{at} درکار'],
   'ready.lifts': ['What lifts it most', 'سب سے زیادہ فائدہ کس سے'],
   'ready.worth': ['Worth up to {points} points of your score', 'آپ کے اسکور میں {points} نمبر تک کا فائدہ'],
+  'ready.getStatement': ['Get the statement for a lender', 'قرض دینے والے کے لیے اسٹیٹمنٹ لیں'],
   'ready.caveat': [
     'These thresholds are prototype defaults, not a lender\'s own policy, and no score decides a loan on its own. A lender sees the same evidence in the lender view.',
     'یہ حدیں نمونے کے طور پر رکھی گئی ہیں، کسی ادارے کی اپنی پالیسی نہیں، اور کوئی اسکور اکیلا قرض کا فیصلہ نہیں کرتا۔ قرض دینے والے کو یہی ثبوت دکھائے جاتے ہیں۔'
@@ -331,6 +332,16 @@ export const STRINGS = {
   'lender.row.outstanding': ['Outstanding customer credit', 'گاہکوں پر باقی ادھار'],
   'lender.row.monthly': ['Average monthly sales', 'ماہانہ اوسط فروخت'],
   'lender.undated': ['Undated', 'بغیر تاریخ'],
+  'lender.download': ['Download statement', 'اسٹیٹمنٹ ڈاؤن لوڈ کریں'],
+  'lender.downloadHint': ['Opens your print dialog — choose "Save as PDF" to keep a copy for a lender.', 'پرنٹ کا خانہ کھلے گا — "Save as PDF" چن کر کاپی محفوظ کر لیں۔'],
+  'lender.statement': ['Credit statement', 'کریڈٹ اسٹیٹمنٹ'],
+  'lender.reference': ['Reference', 'حوالہ نمبر'],
+  'lender.generated': ['Generated', 'تیار کیا گیا'],
+  'lender.pages': ['Ledger pages', 'کھاتے کے صفحات'],
+  'lender.verify': [
+    'This statement was produced by QarzMitr from photographs of the shopkeeper\'s own handwritten ledger. The score is computed by deterministic code from the transactions listed; re-running the same ledger reproduces the same figures. Reference the number above when checking this statement.',
+    'یہ اسٹیٹمنٹ قرض متر نے دکاندار کے اپنے ہاتھ سے لکھے کھاتے کی تصویروں سے بنائی ہے۔ اسکور نیچے درج اندراجات سے طے شدہ حساب کے ذریعے نکالا گیا ہے؛ وہی کھاتہ دوبارہ چلانے پر وہی اعداد آتے ہیں۔ تصدیق کے وقت اوپر دیا گیا حوالہ نمبر استعمال کریں۔'
+  ],
   'lender.method': ['Method', 'طریقہ'],
   'lender.methodTitle': ['How this number was reached', 'یہ عدد کیسے نکلا'],
   'lender.methodBody': [
