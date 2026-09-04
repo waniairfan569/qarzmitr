@@ -1,0 +1,11 @@
+﻿type,amount_pkr,customer_name,transaction_date,note
+sale,380,,2026-08-13,cash sale of 2kg sugar
+sale,250,,2026-08-13,cash sale of milk and dubai (likely dairy product)
+credit_given,1800,Nasreen Bibi,2026-08-13,credit given to Nasreen Bibi
+expense,450,,2026-08-13,tea leaves purchased for stock
+repayment,1100,Imran Ali,2026-08-13,repayment from Imran Ali
+sale,620,,2026-08-13,cash sale of biscuits and snacks
+expense,900,,2026-08-13,mirror (aina) 10kg purchased — likely typo; interpreted as expense
+credit_given,1600,Shazia,2026-08-13,credit given to Shazia
+sale,540,,2026-08-13,cash sale of cold drink
+repayment,700,Nasreen Bibi,2026-08-13,repayment from Nasreen Bibi
