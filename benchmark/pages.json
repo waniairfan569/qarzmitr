@@ -1,0 +1,165 @@
+{
+  "note": "Ground truth for the transcription benchmark. Each row is [type, amount, customer, dayOfSeptember2026]. A null customer means the page names nobody; a null day means the page carries no usable date for that line.",
+  "pages": [
+    {
+      "id": "01-baseline-clean",
+      "why": "Clean, well lit, mixed Urdu and English with a date column. The easy case.",
+      "style": { "font": "Segoe UI", "size": 19, "bg": "252,248,236", "ink": "30,55,120", "rotate": 0, "noise": 0, "dateColumn": true },
+      "header": { "shop": "عائشہ جنرل اسٹور", "sub": "Ayesha General Store - Khata", "period": "September 2026" },
+      "rows": [
+        { "text": "چینی، آٹا، چاول  -  cash sale", "amount": "4,600", "truth": ["sale", 4600, null, 1] },
+        { "text": "نسرین بی بی  -  واپسی (repayment)", "amount": "900", "truth": ["repayment", 900, "Nasreen", 1] },
+        { "text": "دودھ، دہی، انڈے  -  cash sale", "amount": "4,800", "truth": ["sale", 4800, null, 2] },
+        { "text": "عمران علی  -  ادھار (udhaar)", "amount": "1,500", "truth": ["credit_given", 1500, "Imran", 2] },
+        { "text": "بسکٹ، چائے پتی  -  cash sale", "amount": "4,700", "truth": ["sale", 4700, null, 3] },
+        { "text": "تھوک خرید stock  -  expense", "amount": "2,600", "truth": ["expense", 2600, null, 3] }
+      ]
+    },
+    {
+      "id": "02-urdu-only",
+      "why": "No English cue words at all. Type must be inferred from Urdu alone.",
+      "style": { "font": "Segoe UI", "size": 20, "bg": "252,248,236", "ink": "28,40,38", "rotate": 0, "noise": 0, "dateColumn": true },
+      "header": { "shop": "عائشہ جنرل اسٹور", "sub": "کھاتہ", "period": "ستمبر 2026" },
+      "rows": [
+        { "text": "چینی دو کلو نقد فروخت", "amount": "380", "truth": ["sale", 380, null, 1] },
+        { "text": "نسرین بی بی کو ادھار دیا", "amount": "1,800", "truth": ["credit_given", 1800, "Nasreen", 1] },
+        { "text": "عمران علی نے واپس کیا", "amount": "1,100", "truth": ["repayment", 1100, "Imran", 2] },
+        { "text": "چائے پتی خریدی", "amount": "450", "truth": ["expense", 450, null, 2] },
+        { "text": "دودھ نقد فروخت", "amount": "620", "truth": ["sale", 620, null, 3] }
+      ]
+    },
+    {
+      "id": "03-english-only",
+      "why": "The opposite control: no Urdu script at all.",
+      "style": { "font": "Segoe UI", "size": 19, "bg": "255,253,248", "ink": "28,40,38", "rotate": 0, "noise": 0, "dateColumn": true },
+      "header": { "shop": "Ayesha General Store", "sub": "Daily Khata", "period": "September 2026" },
+      "rows": [
+        { "text": "Sugar and rice - cash sale", "amount": "3,900", "truth": ["sale", 3900, null, 1] },
+        { "text": "Bilal Ahmed - goods on credit", "amount": "2,400", "truth": ["credit_given", 2400, "Bilal", 1] },
+        { "text": "Shazia - paid back previous credit", "amount": "1,300", "truth": ["repayment", 1300, "Shazia", 2] },
+        { "text": "Cooking oil restock - expense", "amount": "1,350", "truth": ["expense", 1350, null, 2] }
+      ]
+    },
+    {
+      "id": "04-dense",
+      "why": "Sixteen rows on one page. Tests whether entries get dropped when the page is busy.",
+      "style": { "font": "Segoe UI", "size": 15, "bg": "252,248,236", "ink": "30,55,120", "rotate": 0, "noise": 0, "dateColumn": true },
+      "header": { "shop": "عائشہ جنرل اسٹور", "sub": "Ayesha General Store - Khata", "period": "September 2026" },
+      "rows": [
+        { "text": "چینی  -  cash sale", "amount": "380", "truth": ["sale", 380, null, 1] },
+        { "text": "دودھ  -  cash sale", "amount": "250", "truth": ["sale", 250, null, 1] },
+        { "text": "نسرین بی بی  -  ادھار", "amount": "1,800", "truth": ["credit_given", 1800, "Nasreen", 1] },
+        { "text": "چائے پتی  -  expense", "amount": "450", "truth": ["expense", 450, null, 1] },
+        { "text": "بسکٹ  -  cash sale", "amount": "620", "truth": ["sale", 620, null, 2] },
+        { "text": "عمران علی  -  واپسی", "amount": "1,100", "truth": ["repayment", 1100, "Imran", 2] },
+        { "text": "آٹا  -  expense", "amount": "900", "truth": ["expense", 900, null, 2] },
+        { "text": "کولڈ ڈرنک  -  cash sale", "amount": "540", "truth": ["sale", 540, null, 2] },
+        { "text": "شازیہ  -  ادھار", "amount": "1,600", "truth": ["credit_given", 1600, "Shazia", 3] },
+        { "text": "صابن  -  cash sale", "amount": "310", "truth": ["sale", 310, null, 3] },
+        { "text": "نسرین بی بی  -  واپسی", "amount": "700", "truth": ["repayment", 700, "Nasreen", 3] },
+        { "text": "چاول  -  expense", "amount": "1,250", "truth": ["expense", 1250, null, 3] },
+        { "text": "انڈے  -  cash sale", "amount": "480", "truth": ["sale", 480, null, 4] },
+        { "text": "بلال احمد  -  ادھار", "amount": "2,400", "truth": ["credit_given", 2400, "Bilal", 4] },
+        { "text": "دہی  -  cash sale", "amount": "260", "truth": ["sale", 260, null, 4] },
+        { "text": "شازیہ  -  واپسی", "amount": "900", "truth": ["repayment", 900, "Shazia", 4] }
+      ]
+    },
+    {
+      "id": "05-sparse",
+      "why": "Only three entries. Tests whether a thin page invents rows to fill space.",
+      "style": { "font": "Segoe UI", "size": 21, "bg": "252,248,236", "ink": "28,40,38", "rotate": 0, "noise": 0, "dateColumn": true },
+      "header": { "shop": "عائشہ جنرل اسٹور", "sub": "Khata", "period": "September 2026" },
+      "rows": [
+        { "text": "چینی  -  cash sale", "amount": "420", "truth": ["sale", 420, null, 1] },
+        { "text": "نسرین بی بی  -  ادھار", "amount": "1,200", "truth": ["credit_given", 1200, "Nasreen", 1] },
+        { "text": "دودھ  -  cash sale", "amount": "300", "truth": ["sale", 300, null, 2] }
+      ]
+    },
+    {
+      "id": "06-faded",
+      "why": "Low contrast, as if photographed in poor light or written with a drying pen.",
+      "style": { "font": "Segoe UI", "size": 19, "bg": "236,232,222", "ink": "132,138,140", "rotate": 0, "noise": 0, "dateColumn": true },
+      "header": { "shop": "عائشہ جنرل اسٹور", "sub": "Ayesha General Store", "period": "September 2026" },
+      "rows": [
+        { "text": "چینی، چاول  -  cash sale", "amount": "3,800", "truth": ["sale", 3800, null, 1] },
+        { "text": "نسرین بی بی  -  ادھار", "amount": "1,800", "truth": ["credit_given", 1800, "Nasreen", 1] },
+        { "text": "عمران علی  -  واپسی", "amount": "1,100", "truth": ["repayment", 1100, "Imran", 2] },
+        { "text": "دودھ stock  -  expense", "amount": "1,450", "truth": ["expense", 1450, null, 2] }
+      ]
+    },
+    {
+      "id": "07-rotated",
+      "why": "Page photographed slightly askew, which is how a phone photo of a notebook usually looks.",
+      "style": { "font": "Segoe UI", "size": 19, "bg": "252,248,236", "ink": "30,55,120", "rotate": 3.2, "noise": 0, "dateColumn": true },
+      "header": { "shop": "عائشہ جنرل اسٹور", "sub": "Ayesha General Store - Khata", "period": "September 2026" },
+      "rows": [
+        { "text": "چینی، آٹا  -  cash sale", "amount": "4,200", "truth": ["sale", 4200, null, 1] },
+        { "text": "بلال احمد  -  ادھار", "amount": "2,400", "truth": ["credit_given", 2400, "Bilal", 1] },
+        { "text": "شازیہ  -  واپسی", "amount": "900", "truth": ["repayment", 900, "Shazia", 2] },
+        { "text": "تھوک خرید  -  expense", "amount": "1,550", "truth": ["expense", 1550, null, 2] }
+      ]
+    },
+    {
+      "id": "08-noisy",
+      "why": "Ruled lines and speckle over the writing, as on real notebook paper.",
+      "style": { "font": "Segoe UI", "size": 19, "bg": "250,246,234", "ink": "28,40,38", "rotate": 0, "noise": 900, "dateColumn": true },
+      "header": { "shop": "عائشہ جنرل اسٹور", "sub": "Ayesha General Store", "period": "September 2026" },
+      "rows": [
+        { "text": "چاول، دال  -  cash sale", "amount": "5,100", "truth": ["sale", 5100, null, 1] },
+        { "text": "نسرین بی بی  -  واپسی", "amount": "1,100", "truth": ["repayment", 1100, "Nasreen", 1] },
+        { "text": "عمران علی  -  ادھار", "amount": "2,200", "truth": ["credit_given", 2200, "Imran", 2] },
+        { "text": "بجلی بل  -  expense", "amount": "1,800", "truth": ["expense", 1800, null, 2] }
+      ]
+    },
+    {
+      "id": "09-no-dates",
+      "why": "Only a period in the header, no per-line dates. Undated rows must be recorded as undated, not guessed.",
+      "style": { "font": "Segoe UI", "size": 20, "bg": "252,248,236", "ink": "30,55,120", "rotate": 0, "noise": 0, "dateColumn": false },
+      "header": { "shop": "عائشہ جنرل اسٹور", "sub": "Ayesha General Store - Khata", "period": "" },
+      "rows": [
+        { "text": "چینی، چاول  -  cash sale", "amount": "3,600", "truth": ["sale", 3600, null, null] },
+        { "text": "شازیہ پروین  -  ادھار", "amount": "1,600", "truth": ["credit_given", 1600, "Shazia", null] },
+        { "text": "بلال احمد  -  واپسی", "amount": "1,200", "truth": ["repayment", 1200, "Bilal", null] },
+        { "text": "دودھ stock  -  expense", "amount": "980", "truth": ["expense", 980, null, null] }
+      ]
+    },
+    {
+      "id": "10-plain-amounts",
+      "why": "Amounts written without thousands separators, plus a PKR prefix on some lines.",
+      "style": { "font": "Segoe UI", "size": 19, "bg": "255,253,248", "ink": "28,40,38", "rotate": 0, "noise": 0, "dateColumn": true },
+      "header": { "shop": "عائشہ جنرل اسٹور", "sub": "Ayesha General Store", "period": "September 2026" },
+      "rows": [
+        { "text": "چینی  -  cash sale", "amount": "3750", "truth": ["sale", 3750, null, 1] },
+        { "text": "نسرین بی بی  -  ادھار", "amount": "PKR 1900", "truth": ["credit_given", 1900, "Nasreen", 1] },
+        { "text": "عمران علی  -  واپسی", "amount": "Rs 1050", "truth": ["repayment", 1050, "Imran", 2] },
+        { "text": "آٹا stock  -  expense", "amount": "1425", "truth": ["expense", 1425, null, 2] }
+      ]
+    },
+    {
+      "id": "11-ambiguous",
+      "why": "Deliberately unclear wording. The right behaviour is a best guess plus an uncertainty note, not silent confidence.",
+      "style": { "font": "Segoe UI", "size": 19, "bg": "252,248,236", "ink": "28,40,38", "rotate": 0, "noise": 0, "dateColumn": true },
+      "header": { "shop": "عائشہ جنرل اسٹور", "sub": "Ayesha General Store", "period": "September 2026" },
+      "rows": [
+        { "text": "نسرین  -  1000 (؟)", "amount": "1,000", "truth": ["*", 1000, "Nasreen", 1] },
+        { "text": "سامان  -  لین دین", "amount": "750", "truth": ["*", 750, null, 1] },
+        { "text": "چینی، چاول  -  cash sale", "amount": "4,100", "truth": ["sale", 4100, null, 2] },
+        { "text": "پرانا حساب  -  ادھار", "amount": "2,000", "truth": ["credit_given", 2000, null, 2] }
+      ]
+    },
+    {
+      "id": "12-two-column",
+      "why": "A left credit / right debit layout, which is how many shopkeepers actually rule a page.",
+      "style": { "font": "Segoe UI", "size": 18, "bg": "252,248,236", "ink": "30,55,120", "rotate": 0, "noise": 0, "dateColumn": true, "twoColumn": true },
+      "header": { "shop": "عائشہ جنرل اسٹور", "sub": "Ayesha General Store - Khata", "period": "September 2026" },
+      "rows": [
+        { "text": "چینی، آٹا  -  cash sale", "amount": "4,400", "truth": ["sale", 4400, null, 1] },
+        { "text": "بسکٹ  -  cash sale", "amount": "560", "truth": ["sale", 560, null, 1] },
+        { "text": "نسرین بی بی  -  ادھار", "amount": "1,700", "truth": ["credit_given", 1700, "Nasreen", 2] },
+        { "text": "تھوک خرید  -  expense", "amount": "2,300", "truth": ["expense", 2300, null, 2] },
+        { "text": "عمران علی  -  واپسی", "amount": "1,150", "truth": ["repayment", 1150, "Imran", 3] },
+        { "text": "دودھ  -  cash sale", "amount": "390", "truth": ["sale", 390, null, 3] }
+      ]
+    }
+  ]
+}

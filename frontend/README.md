@@ -1,16 +1,41 @@
-# React + Vite
+# QarzMitr — frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React 19 + Vite 8 + Tailwind 4. The shopkeeper dashboard, the lender view, and
+the authentication screens.
 
-Currently, two official plugins are available:
+See the [project README](../README.md) for what QarzMitr does and how the whole
+pipeline fits together.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Running it
 
-## React Compiler
+The backend must be running first — see [backend](../backend).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+cp .env.example .env      # point VITE_API_BASE_URL at the backend
+npm install
+npm run dev               # http://localhost:5173
+```
 
-## Expanding the Oxlint configuration
+```bash
+npm run build             # production build
+npm run lint              # oxlint
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Layout
+
+| Path | What's there |
+|---|---|
+| `src/pages/` | Route components — dashboard, lender view, auth screens |
+| `src/components/` | Score card, score chart, transaction table, ledger workflow |
+| `src/context/AuthContext.jsx` | Session state and token handling |
+| `src/api/client.js` | Every backend call, in one place |
+| `src/index.css` | Design tokens and shared component classes |
+
+## One thing to know about the CSS
+
+Tailwind v4 puts its utilities in `@layer utilities`, and unlayered CSS beats
+layered CSS regardless of specificity. The component classes in `index.css`
+(`.card`, `.section-kicker`, `.primary-button`) are unlayered, so a Tailwind
+utility will **not** override them — `class="card bg-ink"` silently keeps the
+card's own background. Add a variant class in `index.css` instead of reaching
+for a utility.
