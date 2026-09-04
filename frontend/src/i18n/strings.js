@@ -374,6 +374,11 @@ export const STRINGS = {
   'auth.demoHint': ['Open the seeded shop record instantly.', 'نمونے کی دکان کا کھاتہ فوراً کھولیں۔'],
   'auth.finishingGoogle': ['Finishing Google sign-in…', 'گوگل سے داخلہ مکمل ہو رہا ہے…'],
 
+  'page.showing': ['{first}–{last} of {total}', '{total} میں سے {first}–{last}'],
+  'page.prev': ['Previous', 'پچھلا'],
+  'page.next': ['Next', 'اگلا'],
+  'page.of': ['Page {page} of {pages}', 'صفحہ {page} از {pages}'],
+
   // ---- how it works ----
   'how.eyebrow': ['Financial inclusion, page by page', 'مالی شمولیت، صفحہ بہ صفحہ'],
   'how.headline': ['Paper ledgers → verifiable credit score.', 'کاغذی کھاتہ ← قابلِ تصدیق کریڈٹ اسکور۔'],

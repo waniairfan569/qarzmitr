@@ -3,6 +3,7 @@ import { AlertTriangle, CalendarRange, LoaderCircle, TrendingUp } from 'lucide-r
 import { api } from '../api/client'
 import { useMoney, useT } from '../i18n'
 import { useAuth } from '../context/AuthContext'
+import Pagination, { usePaged } from './Pagination'
 
 const PERIODS = [{ id: 'day' }, { id: 'week' }, { id: 'month' }, { id: 'year' }]
 
@@ -36,6 +37,8 @@ export default function PeriodHistory({ refreshKey }) {
   // period reads as clearly as a strong one.
   const scale = periods.reduce((max, item) => Math.max(max, Math.abs(item.net)), 0) || 1
   const recent = [...periods].reverse()
+  // Daily view can run to dozens of rows; weekly and yearly rarely will.
+  const paged = usePaged(recent, 12)
 
   return (
     <section className="card p-6 md:p-8">
@@ -93,7 +96,7 @@ export default function PeriodHistory({ refreshKey }) {
           <div className="mt-6 overflow-x-auto">
             <table className="w-full min-w-[560px] text-sm">
               <thead>
-                <tr className="border-b border-ink/15 text-[10px] font-bold uppercase tracking-[0.12em] text-ink/45">
+                <tr className="border-b border-ink/15 text-xs font-bold uppercase tracking-[0.08em] text-ink/55">
                   <th className="pb-3 pe-4 text-start">{t(`hist.period`)}</th>
                   <th className="pb-3 pe-4 text-end">{t(`hist.sales`)}</th>
                   <th className="pb-3 pe-4 text-end">{t(`hist.expenses`)}</th>
@@ -104,7 +107,7 @@ export default function PeriodHistory({ refreshKey }) {
                 </tr>
               </thead>
               <tbody>
-                {recent.map((item) => (
+                {paged.visible.map((item) => (
                   <tr key={item.key} className="border-b border-ink/[0.07]">
                     <td className="py-3 pe-4 font-bold text-ink">{item.label}</td>
                     <td className="py-3 pe-4 text-end tabular-nums text-ink/70">{pkr(item.sales)}</td>
@@ -126,6 +129,10 @@ export default function PeriodHistory({ refreshKey }) {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="-mx-6 md:-mx-8">
+            <Pagination {...paged} onPage={paged.setPage} />
           </div>
 
           <p className="mt-5 flex items-start gap-2.5 max-w-3xl border-t border-ink/10 pt-5 text-xs leading-5 text-ink/55">

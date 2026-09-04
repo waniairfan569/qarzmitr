@@ -1,6 +1,7 @@
 import { AlertTriangle, BookOpen, LoaderCircle } from 'lucide-react'
 import { useT } from '../i18n'
 import DateRangeFilter from './DateRangeFilter'
+import Pagination, { usePaged } from './Pagination'
 
 const FILTERS = [
   { value: '', label: 'All entries' },
@@ -27,6 +28,8 @@ function formatDate(value) {
 
 export default function TransactionTable({ transactions, totals, filter, onFilter, range, onRange, loading, error }) {
   const t = useT()
+  const paged = usePaged(transactions)
+
   return (
     <section className="card overflow-hidden">
       {/* The heading sits above the controls rather than beside them, so the
@@ -85,12 +88,12 @@ export default function TransactionTable({ transactions, totals, filter, onFilte
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-left">
             <thead>
-              <tr className="bg-ink/[0.035] text-[10px] font-bold uppercase tracking-[0.18em] text-ink/45">
+              <tr className="bg-ink/[0.035] text-xs font-bold uppercase tracking-[0.12em] text-ink/55">
                 <th className="px-6 py-4 md:px-8">{t(`txn.type`)}</th><th className="px-5 py-4">{t(`txn.amount`)}</th><th className="px-5 py-4">{t(`txn.customer`)}</th><th className="px-5 py-4">{t(`txn.date`)}</th><th className="px-6 py-4 md:px-8">{t(`txn.note`)}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-ink/8">
-              {transactions.map((transaction) => {
+              {paged.visible.map((transaction) => {
                 const uncertain = transaction.note?.toLowerCase().includes('uncertain')
                 return (
                   <tr key={transaction.id} className="transition-colors hover:bg-saffron/[0.06]">
@@ -107,6 +110,10 @@ export default function TransactionTable({ transactions, totals, filter, onFilte
             </tbody>
           </table>
         </div>
+      )}
+
+      {!loading && transactions.length > 0 && (
+        <Pagination {...paged} onPage={paged.setPage} />
       )}
     </section>
   )
