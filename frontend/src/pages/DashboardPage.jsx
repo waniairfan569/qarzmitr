@@ -5,6 +5,8 @@ import { api } from '../api/client'
 import AppShell from '../components/AppShell'
 import CustomerBalances from '../components/CustomerBalances'
 import LedgerWorkflow from '../components/LedgerWorkflow'
+import PaymentReminders from '../components/PaymentReminders'
+import PeriodHistory from '../components/PeriodHistory'
 import ScoreCard from '../components/ScoreCard'
 import ScoreChart from '../components/ScoreChart'
 import TransactionTable from '../components/TransactionTable'
@@ -23,6 +25,7 @@ export default function DashboardPage() {
   const [transactionError, setTransactionError] = useState('')
   const [customers, setCustomers] = useState(null)
   const [customerError, setCustomerError] = useState('')
+  const [refreshKey, setRefreshKey] = useState(0)
 
   const loadDashboard = useCallback(async () => {
     setError('')
@@ -39,6 +42,8 @@ export default function DashboardPage() {
       setTransactions(result.transactions)
       setCustomers(customerResult)
       setFilter('')
+      // Nudges the history and reminder panels to reload after an upload.
+      setRefreshKey((key) => key + 1)
     } catch (requestError) {
       if (requestError.status === 401) logout()
       else setError(requestError.message)
@@ -117,6 +122,10 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-6"><CustomerBalances data={customers} error={customerError} /></div>
+
+      <div className="mt-6"><PaymentReminders refreshKey={refreshKey} /></div>
+
+      <div className="mt-6"><PeriodHistory refreshKey={refreshKey} /></div>
 
       <div className="mt-6"><LedgerWorkflow onDataChanged={loadDashboard} /></div>
       <div className="mt-6"><TransactionTable transactions={transactions} filter={filter} onFilter={changeFilter} loading={transactionLoading} error={transactionError} /></div>

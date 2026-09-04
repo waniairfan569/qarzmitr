@@ -1,5 +1,7 @@
 const { db } = require('../db/database');
 const { buildCustomerBalances } = require('../services/customers');
+const { PERIODS, summariseByPeriod } = require('../services/periods');
+const { buildReminders } = require('../services/reminders');
 
 const VALID_TRANSACTION_TYPES = new Set([
   'sale',
@@ -105,8 +107,44 @@ function getCustomers(req, res, next) {
   }
 }
 
+function getSummary(req, res, next) {
+  const period = (req.query && req.query.period) || 'month';
+
+  if (!PERIODS.has(period)) {
+    return res.status(400).json({
+      message: 'Invalid period. Expected day, week, month or year.'
+    });
+  }
+
+  try {
+    if (!userExists(req.userId)) {
+      return res.status(401).json({ message: 'User account no longer exists.' });
+    }
+
+    return res.json(summariseByPeriod(fetchTransactions(req.userId), period));
+  } catch (error) {
+    return next(error);
+  }
+}
+
+function getReminders(req, res, next) {
+  try {
+    const user = db.prepare('SELECT shop_name FROM users WHERE id = ?').get(req.userId);
+    if (!user) {
+      return res.status(401).json({ message: 'User account no longer exists.' });
+    }
+
+    const { customers } = buildCustomerBalances(fetchTransactions(req.userId));
+    return res.json({ reminders: buildReminders(customers, user.shop_name) });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   getCustomers,
+  getReminders,
+  getSummary,
   getDashboard,
   getTransactions
 };
