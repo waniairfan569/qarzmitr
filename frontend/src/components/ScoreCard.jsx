@@ -51,7 +51,7 @@ export default function ScoreCard({ latestScore }) {
         </div>
         <div>
           <span className={`inline-flex rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold ${tone.accent}`}>{tone.label}</span>
-          <p className="mt-5 text-sm leading-6 text-paper/60">Calculated from ledger activity using transparent, auditable metrics—not an AI-generated guess.</p>
+          <p className="mt-5 text-sm leading-6 text-paper/85">Calculated from ledger activity using transparent, auditable metrics—<strong className="font-bold text-saffron">not an AI-generated guess</strong>.</p>
         </div>
       </div>
     </section>

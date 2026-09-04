@@ -101,7 +101,7 @@ export default function DashboardPage() {
             <Metric icon={WalletCards} value={dashboard.transactions.length} label="Transactions" />
             <Metric icon={BarChart3} value={dashboard.scoreHistory.length} label="Score runs" />
           </div>
-          <p className="mt-5 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/50">The score itself is calculated by deterministic backend code. AI only explains the result in Urdu.</p>
+          <p className="mt-5 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/70">The score itself is calculated by <strong className="font-bold text-leaf">deterministic backend code</strong>. AI only explains the result in Urdu.</p>
         </section>
       </div>
 
