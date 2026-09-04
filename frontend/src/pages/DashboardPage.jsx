@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, BarChart3, Landmark, LoaderCircle, RefreshCw, WalletCards } from 'lucide-react'
+import { AlertTriangle, BarChart3, CalendarRange, Landmark, ListChecks, LoaderCircle, MessageSquareText, RefreshCw, Users, WalletCards } from 'lucide-react'
 import { api } from '../api/client'
 import AppShell from '../components/AppShell'
 import CustomerBalances from '../components/CustomerBalances'
@@ -14,6 +14,13 @@ import { useAuth } from '../context/AuthContext'
 
 const EMPTY_DASHBOARD = { transactions: [], latestScore: null, scoreHistory: [] }
 
+const TABS = [
+  { id: 'udhaar', label: 'Udhaar book', icon: Users },
+  { id: 'reminders', label: 'Reminders', icon: MessageSquareText },
+  { id: 'history', label: 'History', icon: CalendarRange },
+  { id: 'transactions', label: 'Transactions', icon: ListChecks },
+]
+
 export default function DashboardPage() {
   const { token, user, logout } = useAuth()
   const [dashboard, setDashboard] = useState(EMPTY_DASHBOARD)
@@ -26,6 +33,7 @@ export default function DashboardPage() {
   const [customers, setCustomers] = useState(null)
   const [customerError, setCustomerError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
+  const [tab, setTab] = useState('udhaar')
 
   const loadDashboard = useCallback(async () => {
     setError('')
@@ -75,13 +83,15 @@ export default function DashboardPage() {
     return <div className="grid min-h-screen place-content-center bg-paper text-center text-ink"><LoaderCircle className="mx-auto animate-spin text-saffron" size={34} /><p className="mt-4 text-sm font-bold">Opening your ledger…</p></div>
   }
 
+  const owing = customers?.summary?.customers_owing ?? 0
+
   return (
     <AppShell>
-      <header className="mb-9 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      <header className="mb-7 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div className="animate-rise">
           <div className="section-kicker">Shopkeeper dashboard</div>
-          <h1 className="mt-3 max-w-3xl font-display text-5xl leading-[0.95] md:text-7xl">Salaam, {user?.name?.split(' ')[0]}.</h1>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-ink/55">Your paper trail, translated into a financial profile you can understand and stand behind.</p>
+          <h1 className="mt-3 max-w-3xl font-display text-4xl leading-[0.98] md:text-6xl">Salaam, {user?.name?.split(' ')[0]}.</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/55">Your paper trail, translated into a financial profile you can understand and stand behind.</p>
         </div>
         <div className="flex flex-wrap gap-3 self-start md:self-auto">
           <Link className="secondary-button" to="/lender"><Landmark size={15} /> Lender view</Link>
@@ -101,11 +111,15 @@ export default function DashboardPage() {
         <ScoreChart scoreHistory={dashboard.scoreHistory} />
       </div>
 
+      {/* The upload is the whole point of the product, so it sits directly under
+          the score rather than below every panel the score produced. */}
+      <div className="mt-6"><LedgerWorkflow onDataChanged={loadDashboard} /></div>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
         <section className="card p-6 md:p-8">
           <div className="section-kicker">In your own words</div>
           <h2 className="mt-2 font-display text-3xl">What your score means</h2>
-          <div className="mt-6 rounded-2xl border-s-4 border-saffron bg-saffron/[0.08] p-6">
+          <div className="mt-5 rounded-2xl border-s-4 border-saffron bg-saffron/[0.08] p-6">
             <p className="urdu-text text-xl leading-[2.1] text-ink" dir="rtl" lang="ur">
               {dashboard.latestScore?.explanation_text || 'Explanation not available yet'}
             </p>
@@ -113,7 +127,7 @@ export default function DashboardPage() {
         </section>
         <section className="card p-6 md:p-8">
           <div className="section-kicker">Evidence at a glance</div>
-          <div className="mt-6 grid grid-cols-2 gap-3">
+          <div className="mt-5 grid grid-cols-2 gap-3">
             <Metric icon={WalletCards} value={dashboard.transactions.length} label="Transactions" />
             <Metric icon={BarChart3} value={dashboard.scoreHistory.length} label="Score runs" />
           </div>
@@ -121,14 +135,47 @@ export default function DashboardPage() {
         </section>
       </div>
 
-      <div className="mt-6"><CustomerBalances data={customers} error={customerError} /></div>
+      {/* Four long panels became one tabbed shelf, so the page stops growing
+          every time a feature is added. All four stay mounted and are hidden
+          rather than unmounted, so switching is instant and nothing refetches. */}
+      <div className="mt-8">
+        <div className="flex flex-wrap gap-1 rounded-2xl bg-ink/[0.06] p-1.5" role="tablist" aria-label="Ledger detail">
+          {TABS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              id={`tab-${id}`}
+              aria-selected={tab === id}
+              aria-controls={`panel-${id}`}
+              className={`inline-flex flex-1 min-w-[140px] items-center justify-center gap-2 rounded-xl px-4 py-3 text-xs font-bold transition ${
+                tab === id ? 'bg-cream text-ink shadow-[0_2px_10px_rgba(23,57,52,.08)]' : 'text-ink/55 hover:text-ink'
+              }`}
+              onClick={() => setTab(id)}
+            >
+              <Icon size={15} /> {label}
+              {id === 'udhaar' && owing > 0 && (
+                <span className="rounded-full bg-saffron/25 px-2 py-0.5 text-[10px] text-saffron-dark">{owing}</span>
+              )}
+            </button>
+          ))}
+        </div>
 
-      <div className="mt-6"><PaymentReminders refreshKey={refreshKey} /></div>
-
-      <div className="mt-6"><PeriodHistory refreshKey={refreshKey} /></div>
-
-      <div className="mt-6"><LedgerWorkflow onDataChanged={loadDashboard} /></div>
-      <div className="mt-6"><TransactionTable transactions={transactions} filter={filter} onFilter={changeFilter} loading={transactionLoading} error={transactionError} /></div>
+        <div className="mt-4">
+          <div role="tabpanel" id="panel-udhaar" aria-labelledby="tab-udhaar" hidden={tab !== 'udhaar'}>
+            <CustomerBalances data={customers} error={customerError} />
+          </div>
+          <div role="tabpanel" id="panel-reminders" aria-labelledby="tab-reminders" hidden={tab !== 'reminders'}>
+            <PaymentReminders refreshKey={refreshKey} />
+          </div>
+          <div role="tabpanel" id="panel-history" aria-labelledby="tab-history" hidden={tab !== 'history'}>
+            <PeriodHistory refreshKey={refreshKey} />
+          </div>
+          <div role="tabpanel" id="panel-transactions" aria-labelledby="tab-transactions" hidden={tab !== 'transactions'}>
+            <TransactionTable transactions={transactions} filter={filter} onFilter={changeFilter} loading={transactionLoading} error={transactionError} />
+          </div>
+        </div>
+      </div>
 
       <footer className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 text-xs leading-5 text-ink/45 md:flex-row md:justify-between">
         <p>QarzMitr is a feasibility prototype, not a final lending decision.</p>
