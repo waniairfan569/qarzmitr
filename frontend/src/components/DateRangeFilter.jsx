@@ -36,6 +36,7 @@ const PRESETS = ['today', 'week', 'month', 'all']
 export default function DateRangeFilter({ value, onChange, disabled }) {
   const t = useT()
   const [showDates, setShowDates] = useState(false)
+  const datesOpen = showDates || value.preset === 'custom'
 
   function choose(preset) {
     setShowDates(false)
@@ -46,16 +47,18 @@ export default function DateRangeFilter({ value, onChange, disabled }) {
     onChange({ preset: 'custom', ...value, [field]: date })
   }
 
+  // Everything sits on one row and wraps only when the screen is genuinely too
+  // narrow, so the whole filter reads as a single control rather than a stack.
   return (
-    <div className="flex flex-col items-start gap-2">
-      <div className="flex flex-wrap gap-1 rounded-full bg-ink/[0.06] p-1" role="group" aria-label={t(`txn.from`)}>
+    <>
+      <div className="flex flex-wrap items-center gap-1 rounded-full bg-ink/[0.06] p-1" role="group" aria-label={t(`txn.period`)}>
         {PRESETS.map((preset) => (
           <button
             key={preset}
             type="button"
             disabled={disabled}
             aria-pressed={value.preset === preset}
-            className={`rounded-full px-3.5 py-2 text-xs font-bold transition ${
+            className={`rounded-full px-3.5 py-2 text-xs font-bold whitespace-nowrap transition ${
               value.preset === preset ? 'bg-ink text-paper' : 'text-ink/60 hover:text-ink'
             }`}
             onClick={() => choose(preset)}
@@ -67,8 +70,8 @@ export default function DateRangeFilter({ value, onChange, disabled }) {
           type="button"
           disabled={disabled}
           aria-pressed={value.preset === 'custom'}
-          aria-expanded={showDates}
-          className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold transition ${
+          aria-expanded={datesOpen}
+          className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold whitespace-nowrap transition ${
             value.preset === 'custom' ? 'bg-ink text-paper' : 'text-ink/60 hover:text-ink'
           }`}
           onClick={() => setShowDates((open) => !open)}
@@ -77,32 +80,29 @@ export default function DateRangeFilter({ value, onChange, disabled }) {
         </button>
       </div>
 
-      {(showDates || value.preset === 'custom') && (
-        <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-ink/10 bg-cream/70 p-3">
-          <label className="block">
-            <span className="field-label">{t(`txn.from`)}</span>
-            <input
-              className="input-field !mt-1 !py-2 !text-sm"
-              type="date"
-              value={value.from || ''}
-              max={value.to || undefined}
-              disabled={disabled}
-              onChange={(event) => setDate('from', event.target.value)}
-            />
-          </label>
-          <label className="block">
-            <span className="field-label">{t(`txn.to`)}</span>
-            <input
-              className="input-field !mt-1 !py-2 !text-sm"
-              type="date"
-              value={value.to || ''}
-              min={value.from || undefined}
-              disabled={disabled}
-              onChange={(event) => setDate('to', event.target.value)}
-            />
-          </label>
+      {datesOpen && (
+        <div className="flex items-center gap-2 rounded-full border border-ink/12 bg-cream/70 px-3 py-1.5">
+          <input
+            className="border-0 bg-transparent p-0 text-xs font-bold text-ink outline-none"
+            type="date"
+            aria-label={t(`txn.from`)}
+            value={value.from || ''}
+            max={value.to || undefined}
+            disabled={disabled}
+            onChange={(event) => setDate('from', event.target.value)}
+          />
+          <span aria-hidden="true" className="text-ink/35">–</span>
+          <input
+            className="border-0 bg-transparent p-0 text-xs font-bold text-ink outline-none"
+            type="date"
+            aria-label={t(`txn.to`)}
+            value={value.to || ''}
+            min={value.from || undefined}
+            disabled={disabled}
+            onChange={(event) => setDate('to', event.target.value)}
+          />
         </div>
       )}
-    </div>
+    </>
   )
 }

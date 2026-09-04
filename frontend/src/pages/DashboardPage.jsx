@@ -41,7 +41,7 @@ export default function DashboardPage() {
   const [customers, setCustomers] = useState(null)
   const [customerError, setCustomerError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
-  const [tab, setTab] = useState('udhaar')
+  const [tab, setTab] = useState('transactions')
   const [refreshing, setRefreshing] = useState(false)
   const [refreshedAt, setRefreshedAt] = useState(null)
 
@@ -151,32 +151,6 @@ export default function DashboardPage() {
           the score rather than below every panel the score produced. */}
       <div className="mt-6"><LedgerWorkflow onDataChanged={loadDashboard} /></div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
-        <section className="card p-6 md:p-8">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <div className="section-kicker">{t(`explain.kicker`)}</div>
-              <h2 className="mt-2 font-display text-3xl">{t(`explain.title`)}</h2>
-            </div>
-            {/* Hides itself when the device has no Urdu voice installed. */}
-            <ListenButton text={dashboard.latestScore?.explanation_text} label={t(`explain.listen`)} />
-          </div>
-          <div className="mt-5 rounded-2xl border-s-4 border-saffron bg-saffron/[0.08] p-6">
-            <p className="urdu-text text-xl leading-[2.1] text-ink" dir="rtl" lang="ur">
-              {dashboard.latestScore?.explanation_text || t(`explain.none`)}
-            </p>
-          </div>
-        </section>
-        <section className="card p-6 md:p-8">
-          <div className="section-kicker">{t(`evidence.kicker`)}</div>
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <Metric icon={WalletCards} value={dashboard.transactions.length} label={t(`evidence.transactions`)} />
-            <Metric icon={BarChart3} value={dashboard.scoreHistory.length} label={t(`evidence.scoreRuns`)} />
-          </div>
-          <p className="mt-5 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/70">{t(`evidence.note`)}</p>
-        </section>
-      </div>
-
       {/* Four long panels became one tabbed shelf, so the page stops growing
           every time a feature is added. All four stay mounted and are hidden
           rather than unmounted, so switching is instant and nothing refetches. */}
@@ -229,6 +203,32 @@ export default function DashboardPage() {
             />
           </div>
         </div>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+        <section className="card p-6 md:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="section-kicker">{t(`explain.kicker`)}</div>
+              <h2 className="mt-2 font-display text-3xl">{t(`explain.title`)}</h2>
+            </div>
+            {/* Hides itself when the device has no Urdu voice installed. */}
+            <ListenButton text={dashboard.latestScore?.explanation_text} label={t(`explain.listen`)} />
+          </div>
+          <div className="mt-5 rounded-2xl border-s-4 border-saffron bg-saffron/[0.08] p-6">
+            <p className="urdu-text text-xl leading-[2.1] text-ink" dir="rtl" lang="ur">
+              {dashboard.latestScore?.explanation_text || t(`explain.none`)}
+            </p>
+          </div>
+        </section>
+        <section className="card p-6 md:p-8">
+          <div className="section-kicker">{t(`evidence.kicker`)}</div>
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <Metric icon={WalletCards} value={dashboard.transactions.length} label={t(`evidence.transactions`)} />
+            <Metric icon={BarChart3} value={dashboard.scoreHistory.length} label={t(`evidence.scoreRuns`)} />
+          </div>
+          <p className="mt-5 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/70">{t(`evidence.note`)}</p>
+        </section>
       </div>
 
       <footer className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 text-xs leading-5 text-ink/45 md:flex-row md:justify-between">

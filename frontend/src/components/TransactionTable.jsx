@@ -29,7 +29,9 @@ export default function TransactionTable({ transactions, totals, filter, onFilte
   const t = useT()
   return (
     <section className="card overflow-hidden">
-      <div className="flex flex-col gap-5 border-b border-ink/10 p-6 md:flex-row md:items-end md:justify-between md:p-8">
+      {/* The heading sits above the controls rather than beside them, so the
+          whole filter fits on one row instead of stacking into a column. */}
+      <div className="border-b border-ink/10 p-6 md:p-8">
         <div>
           <div className="section-kicker">{t(`txn.kicker`)}</div>
           <h2 className="mt-2 font-display text-3xl">{t(`txn.title`)}</h2>
@@ -47,11 +49,17 @@ export default function TransactionTable({ transactions, totals, filter, onFilte
             <p className="mt-1 text-xs text-ink/45">{t(`txn.undatedNote`)}</p>
           )}
         </div>
-        <div className="flex flex-col items-start gap-3">
+
+        <div className="mt-5 flex flex-wrap items-center gap-2">
           <DateRangeFilter value={range} onChange={onRange} disabled={loading} />
           <label className="block">
             <span className="sr-only">{t(`txn.type`)}</span>
-            <select className="select-field" value={filter} onChange={(event) => onFilter(event.target.value)} disabled={loading}>
+            <select
+              className="select-field !min-w-0 !rounded-full !py-2 !text-xs !font-bold"
+              value={filter}
+              onChange={(event) => onFilter(event.target.value)}
+              disabled={loading}
+            >
               {FILTERS.map((item) => <option key={item.value} value={item.value}>{item.value ? t(`type.${item.value}`) : t(`type.all`)}</option>)}
             </select>
           </label>
