@@ -1,3 +1,5 @@
+import { useT } from '../i18n'
+
 export default function BrandMark({ inverse = false }) {
   const t = useT()
   return (
