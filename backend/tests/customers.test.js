@@ -1,7 +1,13 @@
 const assert = require('node:assert/strict');
 const { describe, it } = require('node:test');
 
-const { buildCustomerBalances, normalizeName, oldestUnsettledDate } = require('../src/services/customers');
+const {
+  buildCustomerBalances,
+  canonicaliseNames,
+  looksLikeSamePerson,
+  normalizeName,
+  oldestUnsettledDate
+} = require('../src/services/customers');
 
 const TODAY = '2026-09-04';
 
@@ -187,5 +193,84 @@ describe('oldestUnsettledDate', () => {
       ),
       '2026-08-02'
     );
+  });
+});
+
+describe('looksLikeSamePerson', () => {
+  it('treats a shortened name as the same person', () => {
+    assert.equal(looksLikeSamePerson('nasreen', 'nasreen bibi'), true);
+    assert.equal(looksLikeSamePerson('imran', 'imran ali'), true);
+  });
+
+  it('refuses to merge on a trailing word, which is usually a different person', () => {
+    // "Ali" is far more likely a second customer than a short form of "Imran Ali".
+    assert.equal(looksLikeSamePerson('ali', 'imran ali'), false);
+    assert.equal(looksLikeSamePerson('bibi', 'nasreen bibi'), false);
+  });
+
+  it('forgives a single-character slip in a name long enough to be sure', () => {
+    assert.equal(looksLikeSamePerson('nasreen', 'nasreem'), true);
+    assert.equal(looksLikeSamePerson('bilal ahmed', 'bilal ahmad'), true);
+    // Too short for one character to be a typo rather than a different name.
+    assert.equal(looksLikeSamePerson('ali', 'asad'), false);
+  });
+
+  it('keeps unrelated names apart', () => {
+    assert.equal(looksLikeSamePerson('nasreen bibi', 'shazia parveen'), false);
+  });
+});
+
+describe('canonicaliseNames', () => {
+  it('picks the fullest, properly written spelling as the canonical one', () => {
+    const { mapping } = canonicaliseNames(['Nasreen', 'nasreen  bibi', 'Nasreen Bibi']);
+    assert.equal(mapping.get('Nasreen'), 'Nasreen Bibi');
+    assert.equal(mapping.get('nasreen bibi'), 'Nasreen Bibi');
+  });
+
+  it('leaves genuinely different customers separate', () => {
+    const { groups } = canonicaliseNames(['Nasreen Bibi', 'Shazia Parveen', 'Bilal Ahmed']);
+    assert.equal(groups.length, 3);
+  });
+});
+
+describe('buildCustomerBalances with spelling variants', () => {
+  it('adds up one customer written three different ways', () => {
+    const result = balances([
+      credit(1000, 'Nasreen Bibi', '2026-08-01'),
+      repay(400, 'Nasreen', '2026-08-10'),
+      credit(500, 'nasreen  bibi', '2026-08-20')
+    ]);
+
+    assert.equal(result.customers.length, 1, 'one person, not three');
+    const nasreen = result.customers[0];
+    assert.equal(nasreen.name, 'Nasreen Bibi');
+    assert.equal(nasreen.credit_given, 1500);
+    assert.equal(nasreen.repaid, 400);
+    assert.equal(nasreen.outstanding, 1100);
+  });
+
+  it('reports the other spellings so the merge is visible, not silent', () => {
+    const result = balances([
+      credit(1000, 'Nasreen Bibi', '2026-08-01'),
+      repay(400, 'Nasreen', '2026-08-10')
+    ]);
+
+    assert.deepEqual(result.customers[0].aliases, ['Nasreen']);
+  });
+
+  it('leaves aliases empty when the name was written consistently', () => {
+    const result = balances([credit(1000, 'Nasreen Bibi', '2026-08-01')]);
+    assert.deepEqual(result.customers[0].aliases, []);
+  });
+
+  it('works on Urdu script as well as transliterations', () => {
+    const result = balances([
+      credit(900, 'عمران علی', '2026-08-01'),
+      repay(300, 'عمران', '2026-08-05')
+    ]);
+
+    assert.equal(result.customers.length, 1);
+    assert.equal(result.customers[0].name, 'عمران علی');
+    assert.equal(result.customers[0].outstanding, 600);
   });
 });

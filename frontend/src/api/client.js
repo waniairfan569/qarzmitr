@@ -48,6 +48,7 @@ export const api = {
   dashboard: (token) => request('/dashboard', { token }),
   customers: (token) => request('/customers', { token }),
   reminders: (token) => request('/reminders', { token }),
+  readiness: (token) => request('/readiness', { token }),
   summary: (token, period = 'month') => request(`/summary?period=${encodeURIComponent(period)}`, { token }),
   transactions: (token, type = '') => request(`/transactions${type ? `?type=${encodeURIComponent(type)}` : ''}`, { token }),
   upload: (token, file) => {

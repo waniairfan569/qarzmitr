@@ -2,6 +2,7 @@ const { db } = require('../db/database');
 const { buildCustomerBalances } = require('../services/customers');
 const { PERIODS, summariseByPeriod } = require('../services/periods');
 const { buildReminders } = require('../services/reminders');
+const { buildReadiness } = require('../services/readiness');
 
 const VALID_TRANSACTION_TYPES = new Set([
   'sale',
@@ -127,6 +128,26 @@ function getSummary(req, res, next) {
   }
 }
 
+function getReadiness(req, res, next) {
+  try {
+    if (!userExists(req.userId)) {
+      return res.status(401).json({ message: 'User account no longer exists.' });
+    }
+
+    const latest = db.prepare(`
+      SELECT score, cash_flow_consistency, repayment_ratio, revenue_trend, computed_at
+      FROM scores
+      WHERE user_id = ?
+      ORDER BY computed_at DESC, id DESC
+      LIMIT 1
+    `).get(req.userId);
+
+    return res.json(buildReadiness(latest, fetchTransactions(req.userId)));
+  } catch (error) {
+    return next(error);
+  }
+}
+
 function getReminders(req, res, next) {
   try {
     const user = db.prepare('SELECT shop_name FROM users WHERE id = ?').get(req.userId);
@@ -143,6 +164,7 @@ function getReminders(req, res, next) {
 
 module.exports = {
   getCustomers,
+  getReadiness,
   getReminders,
   getSummary,
   getDashboard,

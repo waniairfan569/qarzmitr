@@ -9,6 +9,107 @@ function normalizeName(name) {
   return typeof name === 'string' ? name.trim().replace(/\s+/g, ' ') : '';
 }
 
+// Lowercased, punctuation stripped — used only for comparing two names, never
+// for display. The name shown back is always what the ledger actually said.
+function comparableName(name) {
+  return normalizeName(name)
+    .toLowerCase()
+    .replace(/[.,'’`-]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function editDistance(left, right) {
+  if (left === right) return 0;
+  if (Math.abs(left.length - right.length) > 2) return 3;
+
+  let previous = Array.from({ length: right.length + 1 }, (unused, index) => index);
+
+  for (let i = 1; i <= left.length; i += 1) {
+    const current = [i];
+    for (let j = 1; j <= right.length; j += 1) {
+      current[j] = Math.min(
+        previous[j] + 1,
+        current[j - 1] + 1,
+        previous[j - 1] + (left[i - 1] === right[j - 1] ? 0 : 1)
+      );
+    }
+    previous = current;
+  }
+
+  return previous[right.length];
+}
+
+/**
+ * Two spellings are the same customer when either:
+ *
+ *   - the shorter name is how you would shorten the longer one, i.e. its words
+ *     are a leading run of the longer name's words ("Nasreen" for
+ *     "Nasreen Bibi"). Matching on a trailing word is deliberately refused,
+ *     because "Ali" and "Imran Ali" are very often two different people; or
+ *   - they differ by a single character in a name long enough for that to read
+ *     as a slip rather than a different person ("Nasreen" / "Nasreem").
+ *
+ * Anything less certain is left as two customers. Wrongly merging two people
+ * puts one person's debt on another's name, which is far worse than showing a
+ * shopkeeper two rows they can recognise as the same person.
+ */
+function looksLikeSamePerson(left, right) {
+  if (left === right) return true;
+
+  const leftWords = left.split(' ');
+  const rightWords = right.split(' ');
+  const [shorter, longer] = leftWords.length <= rightWords.length
+    ? [leftWords, rightWords]
+    : [rightWords, leftWords];
+
+  if (shorter.every((word, index) => word === longer[index])) {
+    return true;
+  }
+
+  return Math.min(left.length, right.length) >= 5 && editDistance(left, right) <= 1;
+}
+
+/**
+ * Collapses spelling variants onto one canonical name. The fullest spelling
+ * wins, since it carries the most information for the shopkeeper to recognise.
+ */
+function canonicaliseNames(names) {
+  const cleaned = names.map(normalizeName).filter(Boolean);
+  const unique = [...new Set(cleaned)];
+  const frequency = cleaned.reduce((counts, name) => counts.set(name, (counts.get(name) || 0) + 1), new Map());
+  const capitalisedWords = (name) => name.split(' ').filter((word) => /^[A-Z؀-ۿ]/.test(word)).length;
+
+  // Longest first so a shortening attaches to the fullest spelling rather than
+  // the reverse. Between equal-length spellings prefer the one written as a
+  // name — properly capitalised, and failing that the one used most often.
+  const ordered = [...unique].sort((a, b) => (
+    b.length - a.length
+    || capitalisedWords(b) - capitalisedWords(a)
+    || (frequency.get(b) - frequency.get(a))
+    || a.localeCompare(b)
+  ));
+
+  const groups = [];
+  const mapping = new Map();
+
+  for (const name of ordered) {
+    const comparable = comparableName(name);
+    const match = groups.find((group) => group.members
+      .some((member) => looksLikeSamePerson(comparable, comparableName(member))));
+
+    if (match) {
+      match.members.push(name);
+      mapping.set(name, match.canonical);
+    } else {
+      groups.push({ canonical: name, members: [name] });
+      mapping.set(name, name);
+    }
+  }
+
+  return { mapping, groups };
+}
+
 function amountOf(transaction) {
   const amount = Number(transaction.amount);
   return Number.isFinite(amount) ? Math.max(0, amount) : 0;
@@ -47,13 +148,20 @@ function daysSince(date, today) {
 }
 
 function buildCustomerBalances(transactions, today = new Date().toISOString().slice(0, 10)) {
+  const relevant = transactions.filter((transaction) => LEDGER_TYPES.has(transaction.type));
+  const { mapping, groups } = canonicaliseNames(relevant.map((row) => row.customer_name));
+  const aliasesOf = new Map(groups.map((group) => [
+    group.canonical,
+    [...new Set(group.members)].filter((member) => member !== group.canonical)
+  ]));
+
   const byName = new Map();
 
-  for (const transaction of transactions) {
-    if (!LEDGER_TYPES.has(transaction.type)) continue;
+  for (const transaction of relevant) {
+    const written = normalizeName(transaction.customer_name);
+    if (!written) continue;
 
-    const name = normalizeName(transaction.customer_name);
-    if (!name) continue;
+    const name = mapping.get(written) || written;
 
     if (!byName.has(name)) {
       byName.set(name, { name, credits: [], repayments: [], lastActivity: null });
@@ -78,6 +186,9 @@ function buildCustomerBalances(transactions, today = new Date().toISOString().sl
 
     return {
       name: entry.name,
+      // Other spellings of this name found on the ledger, so a merge is visible
+      // to the shopkeeper rather than silent.
+      aliases: aliasesOf.get(entry.name) || [],
       credit_given: creditGiven,
       repaid,
       outstanding: Math.max(0, outstanding),
@@ -118,6 +229,10 @@ function buildCustomerBalances(transactions, today = new Date().toISOString().sl
 
 module.exports = {
   buildCustomerBalances,
+  canonicaliseNames,
+  comparableName,
+  editDistance,
+  looksLikeSamePerson,
   normalizeName,
   oldestUnsettledDate
 };

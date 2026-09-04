@@ -74,6 +74,11 @@ export default function CustomerBalances({ data, loading, error }) {
                   PKR {pkr(customer.credit_given)} given · PKR {pkr(customer.repaid)} repaid
                   {customer.last_activity ? ` · last ${customer.last_activity}` : ''}
                 </span>
+                {customer.aliases?.length > 0 && (
+                  <span className="mt-1 block text-xs text-saffron-dark" title="Different spellings on your pages, counted as one person">
+                    also written as {customer.aliases.join(', ')}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-6">
                 {customer.days_outstanding !== null && (

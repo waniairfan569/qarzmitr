@@ -2,6 +2,7 @@ const express = require('express');
 const {
   getCustomers,
   getDashboard,
+  getReadiness,
   getReminders,
   getSummary,
   getTransactions
@@ -20,6 +21,7 @@ router.post('/score', scoreUser);
 router.get('/dashboard', getDashboard);
 router.get('/transactions', getTransactions);
 router.get('/customers', getCustomers);
+router.get('/readiness', getReadiness);
 router.get('/reminders', getReminders);
 router.get('/summary', getSummary);
 
