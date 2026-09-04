@@ -8,7 +8,7 @@ export default function OverviewPage() {
   const t = useT()
   return (
     <AppShell>
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto w-full">
         <Link className="text-button inline-flex items-center gap-2" to="/dashboard">
           <ArrowLeft size={15} /> {t(`lender.back`)}
         </Link>

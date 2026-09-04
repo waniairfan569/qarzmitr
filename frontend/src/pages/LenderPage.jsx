@@ -109,7 +109,7 @@ export default function LenderPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto w-full">
         <div className="no-print flex flex-wrap items-center justify-between gap-4">
           <Link className="text-button inline-flex items-center gap-2" to="/dashboard">
             <ArrowLeft size={15} /> {t(`lender.back`)}
@@ -227,7 +227,7 @@ export default function LenderPage() {
               <p className="mt-4 max-w-2xl text-sm leading-6 text-ink/60">
                 {t(`lender.methodBody`)}
               </p>
-              <p className="mt-4 rounded-2xl border-s-4 border-coral bg-coral/[0.07] p-5 text-sm leading-6 text-ink/70">
+              <p className="mt-4 max-w-3xl rounded-2xl border-s-4 border-coral bg-coral/[0.07] p-5 text-sm leading-6 text-ink/70">
                 {t(`lender.caveat`)}
               </p>
               {/* Printed only: tells whoever receives the sheet what it is and

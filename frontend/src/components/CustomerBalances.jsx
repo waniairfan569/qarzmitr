@@ -110,7 +110,7 @@ export default function CustomerBalances({ data, loading, error }) {
       )}
 
       {summary && summary.oldest_days_outstanding >= 14 && (
-        <p className="mt-6 flex items-start gap-2.5 rounded-2xl border-s-4 border-saffron bg-saffron/[0.09] p-4 text-sm leading-6 text-ink/75">
+        <p className="mt-6 flex max-w-3xl items-start gap-2.5 rounded-2xl border-s-4 border-saffron bg-saffron/[0.09] p-4 text-sm leading-6 text-ink/75">
           <HandCoins className="mt-0.5 shrink-0 text-saffron-dark" size={17} />
           {t(`udhaar.nudge`, { days: summary.oldest_days_outstanding })}
         </p>

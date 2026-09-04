@@ -13,7 +13,7 @@ export default function AppShell({ children }) {
     <div className="min-h-screen bg-paper text-ink">
       <div className="paper-grid fixed inset-0 pointer-events-none opacity-50" aria-hidden="true" />
       <header className="sticky top-0 z-30 border-b border-ink/10 bg-paper/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-4 md:px-10">
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-5 py-4 md:px-10">
           <BrandMark />
           <div className="flex items-center gap-3 md:gap-5">
             <div className="hidden text-right sm:block">
@@ -34,7 +34,7 @@ export default function AppShell({ children }) {
           </div>
         </div>
       </header>
-      <main className="relative mx-auto max-w-[1440px] px-5 pb-16 pt-8 md:px-10 md:pt-12">{children}</main>
+      <main className="relative mx-auto max-w-[1200px] px-5 pb-16 pt-8 md:px-10 md:pt-12">{children}</main>
     </div>
   )
 }
