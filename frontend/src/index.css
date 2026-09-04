@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Noto+Nastaliq+Urdu:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@500&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -97,6 +97,19 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .ledger-lines { background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(23, 57, 52, .24) 32px), linear-gradient(90deg, transparent 14%, rgba(201, 85, 61, .35) 14.2%, transparent 14.4%); }
 .score-orbit { position: absolute; right: -100px; top: -110px; height: 360px; width: 360px; border: 1px solid rgba(255, 250, 240, .1); border-radius: 50%; box-shadow: 0 0 0 45px rgba(255, 250, 240, .025), 0 0 0 90px rgba(255, 250, 240, .02); }
 .urdu-text { font-family: "Noto Nastaliq Urdu", serif; }
+
+/* Urdu interface. Naskh for labels and controls — readable at small sizes and
+   on one line; Nastaliq stays for the explanation paragraphs, where it is what
+   a reader expects. */
+html[lang="ur"] body,
+html[lang="ur"] button,
+html[lang="ur"] input,
+html[lang="ur"] select { font-family: "Noto Naskh Arabic", "Segoe UI", sans-serif; }
+html[lang="ur"] .font-display { font-family: "Noto Naskh Arabic", serif; font-weight: 700; }
+html[lang="ur"] .section-kicker { letter-spacing: normal; }
+html[lang="ur"] .urdu-text { font-family: "Noto Nastaliq Urdu", serif; }
+/* Nastaliq needs headroom or descenders clip against the line above. */
+html[lang="ur"] h1, html[lang="ur"] h2 { line-height: 1.45; }
 .progress-track { height: 4px; overflow: hidden; border-radius: 99px; background: rgba(23, 57, 52, .15); }
 .progress-bar { height: 100%; width: 42%; border-radius: inherit; background: #173934; animation: progress 1.2s ease-in-out infinite; }
 

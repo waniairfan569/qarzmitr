@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { AlertCircle, Check, LoaderCircle, ScanLine, UploadCloud } from 'lucide-react'
 import { api, ApiError } from '../api/client'
+import { useT } from '../i18n'
 import { useAuth } from '../context/AuthContext'
 
 function Notice({ tone = 'neutral', children }) {
@@ -10,6 +11,7 @@ function Notice({ tone = 'neutral', children }) {
 
 export default function LedgerWorkflow({ onDataChanged }) {
   const { token } = useAuth()
+  const t = useT()
   const inputRef = useRef(null)
   const [file, setFile] = useState(null)
   const [busy, setBusy] = useState('')
@@ -27,12 +29,12 @@ export default function LedgerWorkflow({ onDataChanged }) {
     if (!selected) return
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(selected.type)) {
       setFile(null)
-      setError('Choose a JPEG, PNG, or WebP image.')
+      setError(t(`ledger.badType`))
       return
     }
     if (selected.size > 10 * 1024 * 1024) {
       setFile(null)
-      setError('Image must be 10 MB or smaller.')
+      setError(t(`ledger.tooBig`))
       return
     }
     setFile(selected)
@@ -93,59 +95,59 @@ export default function LedgerWorkflow({ onDataChanged }) {
         <div className="relative overflow-hidden bg-saffron p-6 md:p-8">
           <div className="ledger-lines absolute inset-0 opacity-25" aria-hidden="true" />
           <div className="relative">
-            <div className="section-kicker">New evidence</div>
-            <h2 className="mt-3 max-w-sm font-display text-4xl leading-tight">Turn one ledger page into financial proof.</h2>
-            <p className="mt-4 max-w-md text-sm leading-6 text-ink/65">Photograph the whole page in good light. Anything read uncertainly is flagged rather than hidden, and listed under <strong className="font-bold text-ink/80">To check</strong> for you to correct.</p>
+            <div className="section-kicker">{t(`ledger.kicker`)}</div>
+            <h2 className="mt-3 max-w-sm font-display text-4xl leading-tight">{t(`ledger.title`)}</h2>
+            <p className="mt-4 max-w-md text-sm leading-6 text-ink/65">{t(`ledger.body`)}</p>
 
             <input ref={inputRef} className="sr-only" type="file" name="image" accept="image/jpeg,image/png,image/webp" onChange={chooseFile} />
             <button type="button" className="upload-drop mt-7 w-full" onClick={() => inputRef.current?.click()}>
               <UploadCloud size={28} />
-              <span className="mt-3 font-bold">{file ? file.name : 'Choose a ledger image'}</span>
-              <span className="mt-1 text-xs text-ink/50">JPEG, PNG, or WebP · max 10 MB</span>
+              <span className="mt-3 font-bold">{file ? file.name : t(`ledger.choose`)}</span>
+              <span className="mt-1 text-xs text-ink/50">{t(`ledger.limits`)}</span>
             </button>
             <button type="button" className="primary-button mt-4 w-full" disabled={!file || Boolean(busy)} onClick={uploadLedger}>
-              {busy === 'upload' ? <><LoaderCircle className="animate-spin" size={17} /> Uploading & reading…</> : <><ScanLine size={17} /> Upload & run OCR</>}
+              {busy === 'upload' ? <><LoaderCircle className="animate-spin" size={17} /> {t(`ledger.uploading`)}</> : <><ScanLine size={17} /> {t(`ledger.upload`)}</>}
             </button>
             {busy === 'upload' && <div className="progress-track mt-3"><div className="progress-bar" /></div>}
           </div>
         </div>
 
         <div className="bg-cream p-6 md:p-8">
-          <div className="section-kicker">Processing desk</div>
+          <div className="section-kicker">{t(`ledger.desk`)}</div>
           <div className="mt-6 space-y-4">
-            <ProcessStep number="01" title="Capture & OCR" active={busy === 'upload'} complete={Boolean(uploadResult)}>
+            <ProcessStep number="01" title={t(`ledger.step1`)} active={busy === 'upload'} complete={Boolean(uploadResult)}>
               {uploadResult ? (
                 <div className="mt-2 text-xs leading-5 text-ink/55">
                   <p>{uploadResult.message}</p>
-                  <p><strong className="text-ink">Storage:</strong> {uploadResult.storage_mode}</p>
-                  <p><strong className="text-ink">OCR:</strong> {uploadResult.ocr.status}</p>
+                  <p><strong className="text-ink">{t(`ledger.storage`)}</strong> {uploadResult.storage_mode}</p>
+                  <p><strong className="text-ink">{t(`ledger.ocrLabel`)}</strong> {uploadResult.ocr.status}</p>
                   {uploadResult.ocr.reason && <p>{uploadResult.ocr.reason}</p>}
                   {uploadResult.ledger.raw_ocr_text && (
                     <details className="mt-2 rounded-lg bg-white/45 p-2">
-                      <summary className="cursor-pointer font-bold text-leaf">View extracted text</summary>
+                      <summary className="cursor-pointer font-bold text-leaf">{t(`ledger.viewText`)}</summary>
                       <pre className="mt-2 max-h-28 overflow-auto whitespace-pre-wrap font-sans text-[11px]">{uploadResult.ledger.raw_ocr_text}</pre>
                     </details>
                   )}
                 </div>
-              ) : <p className="mt-1 text-xs text-ink/45">Waiting for an image.</p>}
+              ) : <p className="mt-1 text-xs text-ink/45">{t(`ledger.waiting`)}</p>}
             </ProcessStep>
 
-            <ProcessStep number="02" title="Structure transactions" active={busy === 'structure'} complete={structureResult?.status === 'completed'}>
+            <ProcessStep number="02" title={t(`ledger.step2`)} active={busy === 'structure'} complete={structureResult?.status === 'completed'}>
               {uploadResult && !ocrReady ? (
-                <p className="mt-1 text-xs font-semibold text-coral">OCR skipped: API key not configured. No text is available to structure.</p>
+                <p className="mt-1 text-xs font-semibold text-coral">{t(`ledger.ocrSkipped`)}</p>
               ) : structureResult ? (
-                <p className="mt-1 text-xs text-ink/55">{structureResult.status === 'skipped' ? structureResult.message : `${structureResult.count} transactions created.`}</p>
+                <p className="mt-1 text-xs text-ink/55">{structureResult.status === 'skipped' ? structureResult.message : t(`ledger.created`, { count: structureResult.count })}</p>
               ) : (
-                <button type="button" className="text-button mt-2" disabled={!ocrReady || Boolean(busy)} onClick={structureLedger}>Process ledger</button>
+                <button type="button" className="text-button mt-2" disabled={!ocrReady || Boolean(busy)} onClick={structureLedger}>{t(`ledger.process`)}</button>
               )}
-              {structureResult?.warnings?.length > 0 && <p className="mt-2 text-xs font-bold text-saffron-dark">{structureResult.warnings.length} uncertain or adjusted {structureResult.warnings.length === 1 ? 'entry' : 'entries'} flagged.</p>}
+              {structureResult?.warnings?.length > 0 && <p className="mt-2 text-xs font-bold text-saffron-dark">{t(`ledger.flagged`, { count: structureResult.warnings.length })}</p>}
             </ProcessStep>
 
-            <ProcessStep number="03" title="Compute transparent score" active={busy === 'score'} complete={scoreResult?.score !== undefined}>
+            <ProcessStep number="03" title={t(`ledger.step3`)} active={busy === 'score'} complete={scoreResult?.score !== undefined}>
               {scoreResult ? (
                 <p className="mt-1 text-xs leading-5 text-ink/55">{scoreResult.message}{scoreResult.transaction_count !== undefined && ` (${scoreResult.transaction_count}/${scoreResult.minimum_transactions} transactions)`}</p>
               ) : (
-                <button type="button" className="text-button mt-2" disabled={!canScore || Boolean(busy)} onClick={computeScore}>Compute score</button>
+                <button type="button" className="text-button mt-2" disabled={!canScore || Boolean(busy)} onClick={computeScore}>{t(`ledger.computeScore`)}</button>
               )}
             </ProcessStep>
           </div>

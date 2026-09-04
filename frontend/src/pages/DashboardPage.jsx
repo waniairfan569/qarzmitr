@@ -14,19 +14,21 @@ import ScoreCard from '../components/ScoreCard'
 import ScoreChart from '../components/ScoreChart'
 import TransactionTable from '../components/TransactionTable'
 import { useAuth } from '../context/AuthContext'
+import { useT } from '../i18n'
 
 const EMPTY_DASHBOARD = { transactions: [], latestScore: null, scoreHistory: [] }
 
 const TABS = [
-  { id: 'udhaar', label: 'Udhaar book', icon: Users },
-  { id: 'reminders', label: 'Reminders', icon: MessageSquareText },
-  { id: 'history', label: 'History', icon: CalendarRange },
-  { id: 'review', label: 'To check', icon: ClipboardCheck },
-  { id: 'transactions', label: 'Transactions', icon: ListChecks },
+  { id: 'udhaar', icon: Users },
+  { id: 'reminders', icon: MessageSquareText },
+  { id: 'history', icon: CalendarRange },
+  { id: 'review', icon: ClipboardCheck },
+  { id: 'transactions', icon: ListChecks },
 ]
 
 export default function DashboardPage() {
   const { token, user, logout } = useAuth()
+  const t = useT()
   const [dashboard, setDashboard] = useState(EMPTY_DASHBOARD)
   const [transactions, setTransactions] = useState([])
   const [filter, setFilter] = useState('')
@@ -90,7 +92,7 @@ export default function DashboardPage() {
   }
 
   if (loading) {
-    return <div className="grid min-h-screen place-content-center bg-paper text-center text-ink"><LoaderCircle className="mx-auto animate-spin text-saffron" size={34} /><p className="mt-4 text-sm font-bold">Opening your ledger…</p></div>
+    return <div className="grid min-h-screen place-content-center bg-paper text-center text-ink"><LoaderCircle className="mx-auto animate-spin text-saffron" size={34} /><p className="mt-4 text-sm font-bold">{t(`dash.opening`)}</p></div>
   }
 
   const owing = customers?.summary?.customers_owing ?? 0
@@ -99,25 +101,25 @@ export default function DashboardPage() {
     <AppShell>
       <header className="mb-7 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div className="animate-rise">
-          <div className="section-kicker">Shopkeeper dashboard</div>
-          <h1 className="mt-3 max-w-3xl font-display text-4xl leading-[0.98] md:text-6xl">Salaam, {user?.name?.split(' ')[0]}.</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/55">Your paper trail, translated into a financial profile you can understand and stand behind.</p>
+          <div className="section-kicker">{t(`dash.kicker`)}</div>
+          <h1 className="mt-3 max-w-3xl font-display text-4xl leading-[0.98] md:text-6xl">{t(`dash.greeting`, { name: user?.name?.split(' ')[0] || '' })}</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/55">{t(`dash.subtitle`)}</p>
         </div>
         <div className="flex flex-col items-start gap-2 self-start md:items-end md:self-auto">
           <div className="flex flex-wrap gap-3">
-            <Link className="secondary-button" to="/lender"><Landmark size={15} /> Lender view</Link>
+            <Link className="secondary-button" to="/lender"><Landmark size={15} /> {t(`dash.lenderView`)}</Link>
             <button type="button" className="secondary-button" onClick={loadDashboard} disabled={refreshing}>
               {refreshing
-                ? <><LoaderCircle className="animate-spin" size={15} /> Refreshing…</>
-                : <><RefreshCw size={15} /> Refresh record</>}
+                ? <><LoaderCircle className="animate-spin" size={15} /> {t(`dash.refreshing`)}</>
+                : <><RefreshCw size={15} /> {t(`dash.refresh`)}</>}
             </button>
           </div>
           {/* Without this the button did its work in silence and looked broken. */}
           <p className="min-h-4 text-xs text-ink/45" aria-live="polite">
             {refreshing
-              ? 'Reading your latest entries…'
+              ? t(`dash.reading`)
               : refreshedAt
-                ? `Updated ${refreshedAt.toLocaleTimeString()} · ${dashboard.transactions.length} entries`
+                ? t(`dash.updated`, { time: refreshedAt.toLocaleTimeString(), count: dashboard.transactions.length })
                 : ''}
           </p>
         </div>
@@ -126,7 +128,7 @@ export default function DashboardPage() {
       {error && (
         <div className="mb-6 flex items-center justify-between gap-4 rounded-2xl border border-coral/20 bg-coral/10 p-5 text-sm font-semibold text-coral" role="alert">
           <span className="flex items-center gap-3"><AlertTriangle size={18} />{error}</span>
-          <button className="underline" onClick={loadDashboard}>Try again</button>
+          <button className="underline" onClick={loadDashboard}>{t(`dash.tryAgain`)}</button>
         </div>
       )}
 
@@ -145,25 +147,25 @@ export default function DashboardPage() {
         <section className="card p-6 md:p-8">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <div className="section-kicker">In your own words</div>
-              <h2 className="mt-2 font-display text-3xl">What your score means</h2>
+              <div className="section-kicker">{t(`explain.kicker`)}</div>
+              <h2 className="mt-2 font-display text-3xl">{t(`explain.title`)}</h2>
             </div>
             {/* Hides itself when the device has no Urdu voice installed. */}
-            <ListenButton text={dashboard.latestScore?.explanation_text} label="Sunein" />
+            <ListenButton text={dashboard.latestScore?.explanation_text} label={t(`explain.listen`)} />
           </div>
           <div className="mt-5 rounded-2xl border-s-4 border-saffron bg-saffron/[0.08] p-6">
             <p className="urdu-text text-xl leading-[2.1] text-ink" dir="rtl" lang="ur">
-              {dashboard.latestScore?.explanation_text || 'Explanation not available yet'}
+              {dashboard.latestScore?.explanation_text || t(`explain.none`)}
             </p>
           </div>
         </section>
         <section className="card p-6 md:p-8">
-          <div className="section-kicker">Evidence at a glance</div>
+          <div className="section-kicker">{t(`evidence.kicker`)}</div>
           <div className="mt-5 grid grid-cols-2 gap-3">
-            <Metric icon={WalletCards} value={dashboard.transactions.length} label="Transactions" />
-            <Metric icon={BarChart3} value={dashboard.scoreHistory.length} label="Score runs" />
+            <Metric icon={WalletCards} value={dashboard.transactions.length} label={t(`evidence.transactions`)} />
+            <Metric icon={BarChart3} value={dashboard.scoreHistory.length} label={t(`evidence.scoreRuns`)} />
           </div>
-          <p className="mt-5 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/70">The score itself is calculated by <strong className="font-bold text-leaf">deterministic backend code</strong>. AI only explains the result in Urdu.</p>
+          <p className="mt-5 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/70">{t(`evidence.note`)}</p>
         </section>
       </div>
 
@@ -171,8 +173,8 @@ export default function DashboardPage() {
           every time a feature is added. All four stay mounted and are hidden
           rather than unmounted, so switching is instant and nothing refetches. */}
       <div className="mt-8">
-        <div className="flex flex-wrap gap-1 rounded-2xl bg-ink/[0.06] p-1.5" role="tablist" aria-label="Ledger detail">
-          {TABS.map(({ id, label, icon: Icon }) => (
+        <div className="flex flex-wrap gap-1 rounded-2xl bg-ink/[0.06] p-1.5" role="tablist" aria-label={t(`tab.aria`)}>
+          {TABS.map(({ id, icon: Icon }) => (
             <button
               key={id}
               type="button"
@@ -185,7 +187,7 @@ export default function DashboardPage() {
               }`}
               onClick={() => setTab(id)}
             >
-              <Icon size={15} /> {label}
+              <Icon size={15} /> {t(`tab.${id}`)}
               {id === 'udhaar' && owing > 0 && (
                 <span className="rounded-full bg-saffron/25 px-2 py-0.5 text-[10px] text-saffron-dark">{owing}</span>
               )}
@@ -213,8 +215,8 @@ export default function DashboardPage() {
       </div>
 
       <footer className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 text-xs leading-5 text-ink/45 md:flex-row md:justify-between">
-        <p>QarzMitr is a feasibility prototype, not a final lending decision.</p>
-        <p className="max-w-2xl md:text-right">Built for people who have never used a banking app—using only what they already do.</p>
+        <p>{t(`footer.prototype`)}</p>
+        <p className="max-w-2xl md:text-right">{t(`footer.builtFor`)}</p>
       </footer>
     </AppShell>
   )

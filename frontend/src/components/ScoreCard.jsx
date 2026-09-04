@@ -1,23 +1,25 @@
 import { ArrowUpRight, Sparkles } from 'lucide-react'
+import { useT } from '../i18n'
 
 function scoreTone(score) {
-  if (score < 40) return { accent: 'text-coral', ring: 'stroke-coral', label: 'Needs attention' }
-  if (score < 70) return { accent: 'text-saffron-dark', ring: 'stroke-saffron', label: 'Building momentum' }
-  return { accent: 'text-leaf', ring: 'stroke-leaf', label: 'Strong profile' }
+  if (score < 40) return { accent: 'text-coral', ring: 'stroke-coral', labelKey: 'score.tone.low' }
+  if (score < 70) return { accent: 'text-saffron-dark', ring: 'stroke-saffron', labelKey: 'score.tone.mid' }
+  return { accent: 'text-leaf', ring: 'stroke-leaf', labelKey: 'score.tone.high' }
 }
 
 export default function ScoreCard({ latestScore }) {
+  const t = useT()
   if (!latestScore) {
     return (
       <section className="card relative min-h-[330px] overflow-hidden p-7 md:p-9">
         <div className="relative flex h-full min-h-[270px] flex-col justify-between">
-          <div className="section-kicker">Credit profile</div>
+          <div className="section-kicker">{t(`score.profile`)}</div>
           <div>
-            <p className="font-display text-5xl leading-[0.95] md:text-6xl">Your first score starts with a page.</p>
-            <p className="mt-5 max-w-md text-sm leading-6 text-ink/65">Upload a ledger, structure its entries, and compute a transparent score.</p>
+            <p className="font-display text-5xl leading-[0.95] md:text-6xl">{t(`score.emptyTitle`)}</p>
+            <p className="mt-5 max-w-md text-sm leading-6 text-ink/65">{t(`score.emptyBody`)}</p>
           </div>
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-leaf">
-            Begin below <ArrowUpRight size={15} />
+            {t(`score.beginBelow`)} <ArrowUpRight size={15} />
           </div>
         </div>
       </section>
@@ -32,8 +34,8 @@ export default function ScoreCard({ latestScore }) {
     <section className="card relative overflow-hidden p-7 md:p-9">
       <div className="flex items-start justify-between">
         <div>
-          <div className="section-kicker">Current credit score</div>
-          <p className="mt-2 text-sm text-ink/70">Updated {new Date(latestScore.computed_at).toLocaleDateString()}</p>
+          <div className="section-kicker">{t(`score.kicker`)}</div>
+          <p className="mt-2 text-sm text-ink/70">{t(`score.updated`, { date: new Date(latestScore.computed_at).toLocaleDateString() })}</p>
         </div>
         <Sparkles className="text-saffron-dark" size={22} />
       </div>
@@ -45,12 +47,12 @@ export default function ScoreCard({ latestScore }) {
           </svg>
           <div className="absolute inset-0 grid place-content-center text-center">
             <strong className={`font-display text-6xl leading-none ${tone.accent}`}>{latestScore.score}</strong>
-            <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-ink/70">out of 100</span>
+            <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-ink/70">{t(`score.outOf`)}</span>
           </div>
         </div>
         <div>
-          <span className={`inline-flex rounded-full bg-ink/[0.07] px-3 py-1.5 text-xs font-bold ${tone.accent}`}>{tone.label}</span>
-          <p className="mt-5 text-sm leading-6 text-ink/75">Calculated from ledger activity using transparent, auditable metrics—<strong className="font-bold text-leaf">not an AI-generated guess</strong>.</p>
+          <span className={`inline-flex rounded-full bg-ink/[0.07] px-3 py-1.5 text-xs font-bold ${tone.accent}`}>{t(tone.labelKey)}</span>
+          <p className="mt-5 text-sm leading-6 text-ink/75">{t(`score.note`)}<strong className="font-bold text-leaf">{t(`score.noteStrong`)}</strong></p>
         </div>
       </div>
     </section>

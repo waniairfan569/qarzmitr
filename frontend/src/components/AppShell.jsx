@@ -1,10 +1,13 @@
 import { CircleHelp, LogOut, ShieldCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useT } from '../i18n'
+import LanguageToggle from './LanguageToggle'
 import BrandMark from './BrandMark'
 
 export default function AppShell({ children }) {
   const { user, logout } = useAuth()
+  const t = useT()
 
   return (
     <div className="min-h-screen bg-paper text-ink">
@@ -15,16 +18,17 @@ export default function AppShell({ children }) {
           <div className="flex items-center gap-3 md:gap-5">
             <div className="hidden text-right sm:block">
               <p className="text-sm font-bold text-ink">{user?.shop_name || user?.name}</p>
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-ink/45">Verified workspace</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-ink/45">{t(`shell.workspace`)}</p>
             </div>
+            <LanguageToggle />
             <div className="hidden h-9 w-px bg-ink/10 sm:block" />
-            <Link className="inline-flex min-h-10 items-center gap-2 rounded-full border border-ink/10 px-3 text-xs font-bold text-leaf transition hover:-translate-y-0.5 hover:bg-cream" to="/overview" title="How QarzMitr works">
-              <CircleHelp size={16} /> <span className="hidden sm:inline">How it works</span>
+            <Link className="inline-flex min-h-10 items-center gap-2 rounded-full border border-ink/10 px-3 text-xs font-bold text-leaf transition hover:-translate-y-0.5 hover:bg-cream" to="/overview" title={t(`shell.howItWorks`)}>
+              <CircleHelp size={16} /> <span className="hidden sm:inline">{t(`shell.howItWorks`)}</span>
             </Link>
             <div className="hidden items-center gap-2 rounded-full bg-leaf/10 px-3 py-2 text-xs font-bold text-leaf lg:flex">
-              <ShieldCheck size={14} /> Private & auditable
+              <ShieldCheck size={14} /> {t(`shell.private`)}
             </div>
-            <button className="icon-button" type="button" onClick={logout} title="Log out" aria-label="Log out">
+            <button className="icon-button" type="button" onClick={logout} title={t(`shell.logout`)} aria-label={t(`shell.logout`)}>
               <LogOut size={18} />
             </button>
           </div>

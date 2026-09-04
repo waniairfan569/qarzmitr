@@ -1,22 +1,19 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AlertTriangle, Check, CircleCheck, LoaderCircle, PencilLine } from 'lucide-react'
 import { api } from '../api/client'
+import { useT } from '../i18n'
 import { useAuth } from '../context/AuthContext'
 
-const TYPES = [
-  { id: 'sale', label: 'Sale' },
-  { id: 'expense', label: 'Expense' },
-  { id: 'credit_given', label: 'Credit given (udhaar)' },
-  { id: 'repayment', label: 'Repayment (waapsi)' },
-]
+const TYPES = [{ id: 'sale' }, { id: 'expense' }, { id: 'credit_given' }, { id: 'repayment' }]
 
-const SEVERITY = {
-  high: { chip: 'bg-coral/12 text-coral', label: 'Needs a name' },
-  medium: { chip: 'bg-saffron/18 text-saffron-dark', label: 'Unsure reading' },
-  low: { chip: 'bg-ink/[0.07] text-ink/60', label: 'Missing date' },
+const SEVERITY_CHIP = {
+  high: 'bg-coral/12 text-coral',
+  medium: 'bg-saffron/18 text-saffron-dark',
+  low: 'bg-ink/[0.07] text-ink/60',
 }
 
 export default function ReviewQueue({ refreshKey, onCorrected }) {
+  const t = useT()
   const { token } = useAuth()
   const [queue, setQueue] = useState(null)
   const [editing, setEditing] = useState(null)
@@ -68,7 +65,7 @@ export default function ReviewQueue({ refreshKey, onCorrected }) {
     return (
       <section className="card p-6 md:p-8">
         <div className="flex items-center gap-3 text-sm font-bold text-ink/55">
-          <LoaderCircle className="animate-spin text-saffron" size={18} /> Checking your entries…
+          <LoaderCircle className="animate-spin text-saffron" size={18} /> {t(`rev.checking`)}
         </div>
       </section>
     )
@@ -78,16 +75,15 @@ export default function ReviewQueue({ refreshKey, onCorrected }) {
     <section className="card p-6 md:p-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className="section-kicker">Worth a second look</div>
-          <h2 className="mt-2 font-display text-3xl">Entries to check</h2>
+          <div className="section-kicker">{t(`rev.kicker`)}</div>
+          <h2 className="mt-2 font-display text-3xl">{t(`rev.title`)}</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-ink/60">
-            When the reading was unsure, or a detail is missing, the entry is listed here instead of
-            being quietly accepted. Correct it or confirm it — either way it stops asking.
+            {t(`rev.body`)}
           </p>
         </div>
         {queue.summary.total > 0 && (
           <div className="rounded-2xl bg-ink/[0.05] px-5 py-4 text-end">
-            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/50">To check</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/50">{t(`rev.toCheck`)}</span>
             <strong className="mt-1 block font-display text-3xl text-ink">{queue.summary.total}</strong>
           </div>
         )}
@@ -98,9 +94,9 @@ export default function ReviewQueue({ refreshKey, onCorrected }) {
       {queue.items.length === 0 && (
         <div className="mt-7 rounded-2xl border border-dashed border-leaf/35 bg-leaf/[0.06] p-8 text-center">
           <CircleCheck className="mx-auto text-leaf" size={26} />
-          <p className="mt-3 font-display text-xl">Every entry looks clear</p>
+          <p className="mt-3 font-display text-xl">{t(`rev.emptyTitle`)}</p>
           <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-ink/55">
-            Nothing was flagged as uncertain or incomplete on the pages you have uploaded.
+            {t(`rev.emptyBody`)}
           </p>
         </div>
       )}
@@ -112,12 +108,12 @@ export default function ReviewQueue({ refreshKey, onCorrected }) {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${SEVERITY[item.severity].chip}`}>
-                      {SEVERITY[item.severity].label}
+                    <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${SEVERITY_CHIP[item.severity]}`}>
+                      {t(`rev.sev.${item.severity}`)}
                     </span>
                     <strong className="text-base text-ink">PKR {Number(item.amount || 0).toLocaleString('en-PK')}</strong>
                     <span className="text-xs text-ink/50">
-                      {item.type} · {item.transaction_date || 'no date'}{item.customer_name ? ` · ${item.customer_name}` : ''}
+                      {t(`type.${item.type}`)} · {item.transaction_date || t(`rev.sev.low`)}{item.customer_name ? ` · ${item.customer_name}` : ''}
                     </span>
                   </div>
                   <ul className="mt-2 flex flex-col gap-1">
@@ -131,7 +127,7 @@ export default function ReviewQueue({ refreshKey, onCorrected }) {
                 {editing !== item.id && (
                   <div className="flex shrink-0 gap-2">
                     <button type="button" className="secondary-button !min-h-10 !px-4 !text-xs" onClick={() => startEdit(item)}>
-                      <PencilLine size={14} /> Correct
+                      <PencilLine size={14} /> {t(`rev.correct`)}
                     </button>
                     <button
                       type="button"
@@ -139,7 +135,7 @@ export default function ReviewQueue({ refreshKey, onCorrected }) {
                       disabled={busy === item.id}
                       onClick={() => save(item, {})}
                     >
-                      {busy === item.id ? <LoaderCircle className="animate-spin" size={14} /> : <Check size={14} />} It's right
+                      {busy === item.id ? <LoaderCircle className="animate-spin" size={14} /> : <Check size={14} />} {t(`rev.itsRight`)}
                     </button>
                   </div>
                 )}
@@ -151,28 +147,28 @@ export default function ReviewQueue({ refreshKey, onCorrected }) {
                   onSubmit={(event) => { event.preventDefault(); save(item, draft) }}
                 >
                   <label className="block">
-                    <span className="field-label">What kind of entry</span>
+                    <span className="field-label">{t(`rev.type`)}</span>
                     <select className="select-field w-full" value={draft.type} onChange={(e) => setDraft({ ...draft, type: e.target.value })}>
-                      {TYPES.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
+                      {TYPES.map((option) => <option key={option.id} value={option.id}>{t(`type.${option.id}`)}</option>)}
                     </select>
                   </label>
                   <label className="block">
-                    <span className="field-label">Amount (PKR)</span>
+                    <span className="field-label">{t(`rev.amount`)}</span>
                     <input className="input-field w-full" type="number" min="0" step="1" value={draft.amount} onChange={(e) => setDraft({ ...draft, amount: e.target.value })} />
                   </label>
                   <label className="block">
-                    <span className="field-label">Customer name</span>
-                    <input className="input-field w-full" type="text" value={draft.customer_name} placeholder="Leave empty for a walk-in sale" onChange={(e) => setDraft({ ...draft, customer_name: e.target.value })} />
+                    <span className="field-label">{t(`rev.customer`)}</span>
+                    <input className="input-field w-full" type="text" value={draft.customer_name} placeholder={t(`rev.customerHint`)} onChange={(e) => setDraft({ ...draft, customer_name: e.target.value })} />
                   </label>
                   <label className="block">
-                    <span className="field-label">Date</span>
+                    <span className="field-label">{t(`rev.date`)}</span>
                     <input className="input-field w-full" type="date" value={draft.transaction_date} onChange={(e) => setDraft({ ...draft, transaction_date: e.target.value })} />
                   </label>
                   <div className="flex gap-2 sm:col-span-2">
                     <button type="submit" className="primary-button !min-h-11 !px-5 !text-xs" disabled={busy === item.id}>
-                      {busy === item.id ? <><LoaderCircle className="animate-spin" size={14} /> Saving…</> : <>Save correction</>}
+                      {busy === item.id ? <><LoaderCircle className="animate-spin" size={14} /> {t(`rev.saving`)}</> : <>{t(`rev.save`)}</>}
                     </button>
-                    <button type="button" className="secondary-button !min-h-11 !px-5 !text-xs" onClick={() => setEditing(null)}>Cancel</button>
+                    <button type="button" className="secondary-button !min-h-11 !px-5 !text-xs" onClick={() => setEditing(null)}>{t(`rev.cancel`)}</button>
                   </div>
                 </form>
               )}
@@ -182,8 +178,7 @@ export default function ReviewQueue({ refreshKey, onCorrected }) {
       )}
 
       <p className="mt-6 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/55">
-        Corrections update your score, balances and history straight away — the figures are always
-        recalculated from these entries, never stored separately.
+        {t(`rev.note`)}
       </p>
     </section>
   )

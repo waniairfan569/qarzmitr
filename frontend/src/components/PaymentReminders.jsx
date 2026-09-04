@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AlertTriangle, Check, Copy, LoaderCircle, MessageSquareText } from 'lucide-react'
 import { api } from '../api/client'
+import { useT } from '../i18n'
 import ListenButton from './ListenButton'
 import { useAuth } from '../context/AuthContext'
 
@@ -15,6 +16,7 @@ function pkr(amount) {
 }
 
 export default function PaymentReminders({ refreshKey }) {
+  const t = useT()
   const { token } = useAuth()
   const [reminders, setReminders] = useState([])
   const [language, setLanguage] = useState('urdu')
@@ -45,7 +47,7 @@ export default function PaymentReminders({ refreshKey }) {
       setCopied(reminder.name)
       setTimeout(() => setCopied(''), 2200)
     } catch {
-      setError('Your browser blocked the copy. Select the message and copy it manually.')
+      setError(t(`rem.copyError`))
     }
   }
 
@@ -53,7 +55,7 @@ export default function PaymentReminders({ refreshKey }) {
     return (
       <section className="card p-6 md:p-8">
         <div className="flex items-center gap-3 text-sm font-bold text-ink/55">
-          <LoaderCircle className="animate-spin text-saffron" size={18} /> Preparing reminders…
+          <LoaderCircle className="animate-spin text-saffron" size={18} /> {t(`rem.preparing`)}
         </div>
       </section>
     )
@@ -63,11 +65,10 @@ export default function PaymentReminders({ refreshKey }) {
     <section className="card p-6 md:p-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className="section-kicker">Collect what you're owed</div>
-          <h2 className="mt-2 font-display text-3xl">Ready-to-send reminders</h2>
+          <div className="section-kicker">{t(`rem.kicker`)}</div>
+          <h2 className="mt-2 font-display text-3xl">{t(`rem.title`)}</h2>
           <p className="mt-2 max-w-lg text-sm leading-6 text-ink/60">
-            A polite message for each customer who still owes, written for you. Copy it and send it
-            however you already talk to them.
+            {t(`rem.body`)}
           </p>
         </div>
         {reminders.length > 0 && (
@@ -97,9 +98,9 @@ export default function PaymentReminders({ refreshKey }) {
       {reminders.length === 0 && !error && (
         <div className="mt-7 rounded-2xl border border-dashed border-leaf/35 bg-leaf/[0.06] p-8 text-center">
           <Check className="mx-auto text-leaf" size={26} />
-          <p className="mt-3 font-display text-xl">Everyone has settled up</p>
+          <p className="mt-3 font-display text-xl">{t(`rem.emptyTitle`)}</p>
           <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-ink/55">
-            No customer currently owes you anything. Reminders will appear here when credit goes unpaid.
+            {t(`rem.emptyBody`)}
           </p>
         </div>
       )}
@@ -112,19 +113,19 @@ export default function PaymentReminders({ refreshKey }) {
                 <div className="flex flex-wrap items-center gap-3">
                   <strong className="text-base text-ink">{reminder.name}</strong>
                   <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${TONE_STYLES[reminder.tone]}`}>
-                    {reminder.tone_label}
+                    {t(`rem.tone.${reminder.tone}`)}
                   </span>
                   <span className="text-xs text-ink/50">
                     PKR {pkr(reminder.outstanding)}
-                    {reminder.days_outstanding !== null ? ` · ${reminder.days_outstanding} days` : ''}
+                    {reminder.days_outstanding !== null ? ` · ${t(`udhaar.days`, { days: reminder.days_outstanding })}` : ''}
                   </span>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  {language === 'urdu' && <ListenButton text={reminder.message_urdu} label="Sunein" />}
+                  {language === 'urdu' && <ListenButton text={reminder.message_urdu} label={t(`explain.listen`)} />}
                   <button type="button" className="secondary-button !min-h-10 !px-4 !text-xs" onClick={() => copyMessage(reminder)}>
                     {copied === reminder.name
-                      ? <><Check size={14} /> Copied</>
-                      : <><Copy size={14} /> Copy message</>}
+                      ? <><Check size={14} /> {t(`rem.copied`)}</>
+                      : <><Copy size={14} /> {t(`rem.copy`)}</>}
                   </button>
                 </div>
               </div>
@@ -143,8 +144,7 @@ export default function PaymentReminders({ refreshKey }) {
 
       <p className="mt-6 flex items-start gap-2.5 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/55">
         <MessageSquareText className="mt-0.5 shrink-0 text-saffron-dark" size={15} />
-        The wording is fixed, not generated, so it reads the same every time and works with no connection.
-        Tone follows how long the credit has been outstanding — nothing is sent on your behalf.
+        {t(`rem.note`)}
       </p>
     </section>
   )

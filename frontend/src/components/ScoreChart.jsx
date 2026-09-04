@@ -1,19 +1,21 @@
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { TrendingUp } from 'lucide-react'
+import { useT } from '../i18n'
 
 function formatDate(value) {
   return new Intl.DateTimeFormat('en-PK', { day: 'numeric', month: 'short' }).format(new Date(value))
 }
 
 export default function ScoreChart({ scoreHistory }) {
+  const t = useT()
   const data = scoreHistory.map((item) => ({ ...item, dateLabel: formatDate(item.computed_at) }))
 
   return (
     <section className="card min-h-[330px] p-6 md:p-8">
       <div className="flex items-start justify-between">
         <div>
-          <div className="section-kicker">Score journey</div>
-          <h2 className="mt-2 font-display text-3xl text-ink">Progress over time</h2>
+          <div className="section-kicker">{t(`chart.kicker`)}</div>
+          <h2 className="mt-2 font-display text-3xl text-ink">{t(`chart.title`)}</h2>
         </div>
         <div className="icon-chip"><TrendingUp size={18} /></div>
       </div>

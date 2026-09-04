@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ArrowRight, AlertCircle, KeyRound, LoaderCircle } from 'lucide-react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import AuthFrame from '../components/AuthFrame'
+import { useT } from '../i18n'
 import GoogleButton from '../components/GoogleButton'
 import { useAuth } from '../context/AuthContext'
 
@@ -10,6 +11,7 @@ const DEMO_CREDENTIALS = { email: 'demo@qarzmitr.com', password: 'Demo1234!' }
 export default function LoginPage() {
   const { login, isAuthenticated } = useAuth()
   const navigate = useNavigate()
+  const t = useT()
   const location = useLocation()
   const [form, setForm] = useState({ email: '', password: '' })
   // A failed Google redirect comes back as ?error=… on this page.
@@ -42,15 +44,15 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthFrame eyebrow="Welcome back" title="Open your shop record." subtitle="Sign in to continue building your financial story.">
+    <AuthFrame eyebrow={t(`auth.welcomeBack`)} title={t(`auth.openRecord`)} subtitle="">
       <aside className="mb-6 rounded-2xl border border-saffron/35 bg-saffron/[0.09] p-4" aria-label="Demo account credentials">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-sm font-bold text-ink"><KeyRound className="text-saffron-dark" size={17} /> Try the demo</div>
+            <div className="flex items-center gap-2 text-sm font-bold text-ink"><KeyRound className="text-saffron-dark" size={17} /> {t(`auth.tryDemo`)}</div>
             <p className="mt-1 text-xs leading-5 text-ink/55">Open the seeded shop record instantly.</p>
           </div>
           <button className="shrink-0 rounded-lg border border-ink/15 bg-cream px-3 py-2 text-[11px] font-bold text-leaf transition hover:-translate-y-0.5 hover:border-leaf/40" type="button" onClick={fillDemoCredentials}>
-            Fill demo credentials
+            {t(`auth.fillDemo`)}
           </button>
         </div>
         <dl className="mt-3 grid gap-2 rounded-xl bg-ink/[0.045] p-3 text-xs sm:grid-cols-2">
@@ -60,17 +62,17 @@ export default function LoginPage() {
       </aside>
       <div className="mb-6 space-y-4"><GoogleButton label="Sign in with Google" /></div>
       <form className="space-y-5" onSubmit={submit} noValidate>
-        <Field label="Email address" type="email" autoComplete="email" value={form.email} onChange={(value) => setForm({ ...form, email: value })} placeholder="you@shop.com" />
-        <Field label="Password" type="password" autoComplete="current-password" value={form.password} onChange={(value) => setForm({ ...form, password: value })} placeholder="At least 8 characters" />
+        <Field label={t(`auth.email`)} type="email" autoComplete="email" value={form.email} onChange={(value) => setForm({ ...form, email: value })} placeholder="you@shop.com" />
+        <Field label={t(`auth.password`)} type="password" autoComplete="current-password" value={form.password} onChange={(value) => setForm({ ...form, password: value })} placeholder="At least 8 characters" />
         <div className="flex justify-end -mt-2">
-          <Link className="text-button" to="/forgot-password">Forgot your password?</Link>
+          <Link className="text-button" to="/forgot-password">{t(`auth.forgot`)}</Link>
         </div>
         {error && <div className="error-box" role="alert"><AlertCircle size={17} />{error}</div>}
         <button className="primary-button w-full" type="submit" disabled={loading}>
-          {loading ? <><LoaderCircle className="animate-spin" size={17} /> Signing in…</> : <>Sign in <ArrowRight size={17} /></>}
+          {loading ? <><LoaderCircle className="animate-spin" size={17} /> {t(`auth.signingIn`)}</> : <>{t(`auth.signIn`)} <ArrowRight size={17} /></>}
         </button>
       </form>
-      <p className="mt-7 text-center text-sm text-ink/55">New to QarzMitr? <Link className="font-bold text-leaf underline decoration-saffron decoration-2 underline-offset-4" to="/signup">Create an account</Link></p>
+      <p className="mt-7 text-center text-sm text-ink/55">{t(`auth.newHere`)} <Link className="font-bold text-leaf underline decoration-saffron decoration-2 underline-offset-4" to="/signup">{t(`auth.createAccount`)}</Link></p>
     </AuthFrame>
   )
 }

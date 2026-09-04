@@ -4,15 +4,16 @@ import { AlertTriangle, ArrowLeft, FileText, LoaderCircle, TrendingDown, Trendin
 import { api } from '../api/client'
 import AppShell from '../components/AppShell'
 import { useAuth } from '../context/AuthContext'
+import { useT } from '../i18n'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
 // Tone classes are written out in full so Tailwind can see them at build time.
 const BANDS = [
-  { min: 70, label: 'Recommended', multiple: 1, tone: 'text-leaf', note: 'Consistent ledger evidence across the tracked period.' },
-  { min: 55, label: 'Recommended with review', multiple: 0.5, tone: 'text-saffron-dark', note: 'Viable, but confirm repayment behaviour before disbursing.' },
-  { min: 40, label: 'Refer for manual review', multiple: 0, tone: 'text-saffron-dark', note: 'Ledger evidence is mixed. No automatic facility suggested.' },
-  { min: 0, label: 'Not recommended yet', multiple: 0, tone: 'text-coral', note: 'Insufficient or declining evidence. Re-assess after more ledger pages.' }
+  { min: 70, id: 'recommended', multiple: 1, tone: 'text-leaf' },
+  { min: 55, id: 'review', multiple: 0.5, tone: 'text-saffron-dark' },
+  { min: 40, id: 'manual', multiple: 0, tone: 'text-saffron-dark' },
+  { min: 0, id: 'none', multiple: 0, tone: 'text-coral' },
 ]
 
 function pkr(amount) {
@@ -67,6 +68,7 @@ function buildAssessment(transactions, latestScore, scoreHistory) {
 
 export default function LenderPage() {
   const { token, user, logout } = useAuth()
+  const t = useT()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -96,7 +98,7 @@ export default function LenderPage() {
     return (
       <div className="grid min-h-screen place-content-center bg-paper text-center text-ink">
         <LoaderCircle className="mx-auto animate-spin text-saffron" size={34} />
-        <p className="mt-4 text-sm font-bold">Preparing assessment…</p>
+        <p className="mt-4 text-sm font-bold">{t(`lender.preparing`)}</p>
       </div>
     )
   }
@@ -105,7 +107,7 @@ export default function LenderPage() {
     <AppShell>
       <div className="mx-auto max-w-5xl">
         <Link className="text-button inline-flex items-center gap-2" to="/dashboard">
-          <ArrowLeft size={15} /> Back to shopkeeper view
+          <ArrowLeft size={15} /> {t(`lender.back`)}
         </Link>
 
         {error && (
@@ -115,53 +117,56 @@ export default function LenderPage() {
         )}
 
         <header className="mt-6">
-          <div className="section-kicker">Lender assessment</div>
-          <h1 className="mt-3 font-display text-4xl leading-[1.02] md:text-5xl">{user?.shop_name || 'Unnamed shop'}</h1>
+          <div className="section-kicker">{t(`lender.kicker`)}</div>
+          <h1 className="mt-3 font-display text-4xl leading-[1.02] md:text-5xl">{user?.shop_name || t(`lender.unnamed`)}</h1>
           <p className="mt-3 text-sm text-ink/55">
-            {user?.name} · Prepared {new Date().toLocaleDateString()} · Evidence from ledger photographs only
+            {t(`lender.prepared`, { name: user?.name || '', date: new Date().toLocaleDateString() })}
           </p>
         </header>
 
         {!data?.latestScore || !assessment ? (
           <section className="card mt-6 p-8 text-center">
             <FileText className="mx-auto text-ink/30" size={30} />
-            <p className="mt-4 font-display text-2xl">No score has been computed yet</p>
+            <p className="mt-4 font-display text-2xl">{t(`lender.noScore`)}</p>
             <p className="mx-auto mt-2 max-w-md text-sm text-ink/55">
-              This applicant needs at least one processed ledger page before an assessment can be produced.
+              {t(`lender.noScoreBody`)}
             </p>
           </section>
         ) : (
           <>
             <section className="card mt-6 grid gap-8 p-7 md:grid-cols-[210px_1fr] md:p-9">
               <div className="text-center md:text-left">
-                <div className="section-kicker">Score</div>
+                <div className="section-kicker">{t(`lender.score`)}</div>
                 <strong className={`mt-2 block font-display text-7xl leading-none ${assessment.band.tone}`}>
                   {data.latestScore.score}
                 </strong>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink/45">out of 100</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink/45">{t(`lender.outOf`)}</span>
                 {assessment.delta !== null && (
                   <p className={`mt-4 inline-flex items-center gap-1.5 text-xs font-bold ${assessment.delta < 0 ? 'text-coral' : 'text-leaf'}`}>
                     {assessment.delta < 0 ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
-                    {assessment.delta > 0 ? '+' : ''}{assessment.delta} since previous run
+                    {t(`lender.since`, { delta: `${assessment.delta > 0 ? `+` : ``}${assessment.delta}` })}
                   </p>
                 )}
               </div>
 
               <div className="border-t border-ink/10 pt-6 md:border-s md:border-t-0 md:ps-8 md:pt-0">
-                <div className="section-kicker">Recommendation</div>
+                <div className="section-kicker">{t(`lender.recommendation`)}</div>
                 <p className={`mt-2 font-display text-3xl leading-tight ${assessment.band.tone}`}>
-                  {assessment.band.label}
+                  {t(`lender.band.${assessment.band.id}`)}
                 </p>
-                <p className="mt-3 max-w-md text-sm leading-6 text-ink/60">{assessment.band.note}</p>
+                <p className="mt-3 max-w-md text-sm leading-6 text-ink/60">{t(`lender.note.${assessment.band.id}`)}</p>
                 {assessment.band.multiple > 0 && (
                   <div className="mt-5 rounded-2xl bg-ink/[0.045] p-5">
                     <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink/45">
-                      Indicative facility ceiling
+                      {t(`lender.ceiling`)}
                     </span>
                     <strong className="mt-1 block font-display text-3xl">{pkr(assessment.facility)}</strong>
                     <p className="mt-2 text-xs leading-5 text-ink/50">
-                      {assessment.band.multiple}× average monthly sales of {pkr(assessment.monthlySales)},
-                      measured across {assessment.spanDays} days of ledger evidence.
+                      {t(`lender.ceilingNote`, {
+                        multiple: assessment.band.multiple,
+                        sales: pkr(assessment.monthlySales),
+                        days: assessment.spanDays,
+                      })}
                     </p>
                   </div>
                 )}
@@ -169,42 +174,36 @@ export default function LenderPage() {
             </section>
 
             <section className="mt-6 grid gap-4 sm:grid-cols-3">
-              <Metric label="Cash flow consistency" value={data.latestScore.cash_flow_consistency} weight="40%" />
-              <Metric label="Repayment ratio" value={data.latestScore.repayment_ratio} weight="35%" />
-              <Metric label="Revenue trend" value={data.latestScore.revenue_trend} weight="25%" />
+              <Metric label={t(`lender.metric.cashflow`)} value={data.latestScore.cash_flow_consistency} weight="40%" />
+              <Metric label={t(`lender.metric.repayment`)} value={data.latestScore.repayment_ratio} weight="35%" />
+              <Metric label={t(`lender.metric.revenue`)} value={data.latestScore.revenue_trend} weight="25%" />
             </section>
 
             <section className="card mt-6 p-6 md:p-8">
-              <div className="section-kicker">Ledger evidence</div>
-              <h2 className="mt-2 font-display text-2xl">What the paper record shows</h2>
+              <div className="section-kicker">{t(`lender.evidence`)}</div>
+              <h2 className="mt-2 font-display text-2xl">{t(`lender.evidenceTitle`)}</h2>
               <dl className="mt-6 grid gap-x-8 gap-y-0 sm:grid-cols-2">
-                <Row label="Transactions on record" value={data.transactions.length} />
-                <Row label="Named customers" value={assessment.customers} />
-                <Row label="Period covered" value={assessment.firstDay ? `${assessment.firstDay} → ${assessment.lastDay}` : 'Undated'} />
-                <Row label="Score runs" value={data.scoreHistory.length} />
-                <Row label="Total sales" value={pkr(assessment.sales)} />
-                <Row label="Total expenses" value={pkr(assessment.expenses)} />
-                <Row label="Credit extended to customers" value={pkr(assessment.creditGiven)} />
-                <Row label="Repaid by customers" value={pkr(assessment.repaid)} />
-                <Row label="Outstanding customer credit" value={pkr(assessment.outstanding)} emphasis />
-                <Row label="Average monthly sales" value={pkr(assessment.monthlySales)} emphasis />
+                <Row label={t(`lender.row.transactions`)} value={data.transactions.length} />
+                <Row label={t(`lender.row.customers`)} value={assessment.customers} />
+                <Row label={t(`lender.row.period`)} value={assessment.firstDay ? `${assessment.firstDay} → ${assessment.lastDay}` : t(`lender.undated`)} />
+                <Row label={t(`lender.row.runs`)} value={data.scoreHistory.length} />
+                <Row label={t(`lender.row.sales`)} value={pkr(assessment.sales)} />
+                <Row label={t(`lender.row.expenses`)} value={pkr(assessment.expenses)} />
+                <Row label={t(`lender.row.credit`)} value={pkr(assessment.creditGiven)} />
+                <Row label={t(`lender.row.repaid`)} value={pkr(assessment.repaid)} />
+                <Row label={t(`lender.row.outstanding`)} value={pkr(assessment.outstanding)} emphasis />
+                <Row label={t(`lender.row.monthly`)} value={pkr(assessment.monthlySales)} emphasis />
               </dl>
             </section>
 
             <section className="card mt-6 p-6 md:p-8">
-              <div className="section-kicker">Method</div>
-              <h2 className="mt-2 font-display text-2xl">How this number was reached</h2>
+              <div className="section-kicker">{t(`lender.method`)}</div>
+              <h2 className="mt-2 font-display text-2xl">{t(`lender.methodTitle`)}</h2>
               <p className="mt-4 max-w-2xl text-sm leading-6 text-ink/60">
-                The score is arithmetic, not inference. Three metrics are computed from the transaction
-                record in backend code and combined at fixed weights — 40% cash flow consistency,
-                35% repayment ratio, 25% revenue trend. Re-running the same ledger always produces the
-                same score. A language model is used only to transcribe the handwriting and to explain
-                the finished result to the shopkeeper in Urdu; it is never asked what the score should be.
+                {t(`lender.methodBody`)}
               </p>
               <p className="mt-4 rounded-2xl border-s-4 border-coral bg-coral/[0.07] p-5 text-sm leading-6 text-ink/70">
-                <strong>This is a feasibility prototype.</strong> The band thresholds and the facility
-                multiple above are illustrative defaults, not underwriting policy, and transcription of
-                handwriting can carry errors. No figure here should decide a loan on its own.
+                {t(`lender.caveat`)}
               </p>
             </section>
           </>

@@ -1,4 +1,5 @@
 import { AlertTriangle, BookOpen, LoaderCircle } from 'lucide-react'
+import { useT } from '../i18n'
 
 const FILTERS = [
   { value: '', label: 'All entries' },
@@ -20,18 +21,19 @@ function formatDate(value) {
 }
 
 export default function TransactionTable({ transactions, filter, onFilter, loading, error }) {
+  const t = useT()
   return (
     <section className="card overflow-hidden">
       <div className="flex flex-col gap-5 border-b border-ink/10 p-6 md:flex-row md:items-end md:justify-between md:p-8">
         <div>
-          <div className="section-kicker">Ledger activity</div>
-          <h2 className="mt-2 font-display text-3xl">Transaction history</h2>
+          <div className="section-kicker">{t(`txn.kicker`)}</div>
+          <h2 className="mt-2 font-display text-3xl">{t(`txn.title`)}</h2>
           <p className="mt-2 text-sm text-ink/50">{transactions.length} {transactions.length === 1 ? 'entry' : 'entries'} in this view</p>
         </div>
         <label className="block">
-          <span className="sr-only">Filter transactions by type</span>
+          <span className="sr-only">{t(`txn.type`)}</span>
           <select className="select-field" value={filter} onChange={(event) => onFilter(event.target.value)} disabled={loading}>
-            {FILTERS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+            {FILTERS.map((item) => <option key={item.value} value={item.value}>{item.value ? t(`type.${item.value}`) : t(`type.all`)}</option>)}
           </select>
         </label>
       </div>
@@ -46,7 +48,7 @@ export default function TransactionTable({ transactions, filter, onFilter, loadi
       ) : transactions.length === 0 ? (
         <div className="grid min-h-64 place-content-center px-6 text-center">
           <BookOpen className="mx-auto text-saffron" size={30} />
-          <p className="mt-4 font-display text-2xl text-ink/45">No entries on this page yet.</p>
+          <p className="mt-4 font-display text-2xl text-ink/45">{t(`txn.empty`)}</p>
           <p className="mt-2 text-sm text-ink/45">Upload and process a ledger to bring the record to life.</p>
         </div>
       ) : (
@@ -54,7 +56,7 @@ export default function TransactionTable({ transactions, filter, onFilter, loadi
           <table className="w-full min-w-[760px] text-left">
             <thead>
               <tr className="bg-ink/[0.035] text-[10px] font-bold uppercase tracking-[0.18em] text-ink/45">
-                <th className="px-6 py-4 md:px-8">Type</th><th className="px-5 py-4">Amount</th><th className="px-5 py-4">Customer</th><th className="px-5 py-4">Date</th><th className="px-6 py-4 md:px-8">Note</th>
+                <th className="px-6 py-4 md:px-8">{t(`txn.type`)}</th><th className="px-5 py-4">{t(`txn.amount`)}</th><th className="px-5 py-4">{t(`txn.customer`)}</th><th className="px-5 py-4">{t(`txn.date`)}</th><th className="px-6 py-4 md:px-8">{t(`txn.note`)}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-ink/8">
