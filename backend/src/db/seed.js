@@ -58,10 +58,18 @@ function dateForOffset(dayOffset) {
   return utcDay(dayOffset).toISOString().slice(0, 10);
 }
 
+// Timestamps must match what SQLite's CURRENT_TIMESTAMP writes, "YYYY-MM-DD
+// HH:MM:SS", because every other row in the database is stored that way and the
+// columns are sorted as text. An ISO string with a "T" sorts after a space, so
+// mixing the two formats makes a seeded score outrank a newer computed one.
+function sqliteTimestamp(date) {
+  return date.toISOString().slice(0, 19).replace('T', ' ');
+}
+
 function timestampForOffset(dayOffset, hour = 12) {
   const date = utcDay(dayOffset);
   date.setUTCHours(hour, 0, 0, 0);
-  return date.toISOString();
+  return sqliteTimestamp(date);
 }
 
 function buildTransactions() {
@@ -173,7 +181,7 @@ function seedDatabase(passwordHash) {
         snapshot.metrics.cashFlowConsistency,
         snapshot.metrics.repaymentRatio,
         snapshot.metrics.revenueTrend,
-        isLatest ? new Date().toISOString() : timestampForOffset(snapshot.dayOffset, 18)
+        isLatest ? sqliteTimestamp(new Date()) : timestampForOffset(snapshot.dayOffset, 18)
       );
     });
   });

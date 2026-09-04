@@ -46,7 +46,9 @@ function fetchScoreHistory(userId) {
       computed_at
     FROM scores
     WHERE user_id = ?
-    ORDER BY computed_at ASC, id ASC
+    -- datetime() so a row written as an ISO string and one written by SQLite's
+    -- CURRENT_TIMESTAMP still order by real time rather than by raw text.
+    ORDER BY datetime(computed_at) ASC, computed_at ASC, id ASC
   `).all(userId);
 }
 
@@ -138,7 +140,7 @@ function getReadiness(req, res, next) {
       SELECT score, cash_flow_consistency, repayment_ratio, revenue_trend, computed_at
       FROM scores
       WHERE user_id = ?
-      ORDER BY computed_at DESC, id DESC
+      ORDER BY datetime(computed_at) DESC, computed_at DESC, id DESC
       LIMIT 1
     `).get(req.userId);
 
