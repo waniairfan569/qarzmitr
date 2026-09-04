@@ -39,7 +39,7 @@ Finally the finished score is handed to Qwen-Plus, which explains it to the shop
 
 The scoring maths runs entirely in ordinary backend code. It is deterministic — the same ledger in any row order returns an identical number — and it is auditable line by line. A language model is used only to *read* the handwriting and to *explain* the finished result. It is never asked what the score should be.
 
-This matters because the obvious question about any AI credit product is "how do I know this isn't a hallucinated number?" Our answer is structural rather than reassuring: the model was never given the option. We back it with 69 automated tests, one of which pins the exact score from our live demo run so a regression in the formula fails loudly.
+This matters because the obvious question about any AI credit product is "how do I know this isn't a hallucinated number?" Our answer is structural rather than reassuring: the model was never given the option. We back it with 135 automated tests, one of which pins the exact score from our live demo run so a regression in the formula fails loudly.
 
 Three further choices follow from the same principle:
 
@@ -47,38 +47,89 @@ Three further choices follow from the same principle:
 - **Absence is not evidence.** A shopkeeper who has never extended credit scores a neutral 50, not zero — there is no repayment history to judge. Undated lines are excluded from time-based metrics rather than assigned a guessed week.
 - **It refuses thin data.** Fewer than 3 transactions, or sales on fewer than 2 distinct dates, returns a `422` explaining what is missing instead of producing a confident number from nothing.
 
+We also made that maths visible rather than merely claiming it. Cash flow consistency is measured on weekly net income, and the trading history returns those same weeks — 2,350 · 16,820 · 18,950 · 15,000. A judge can point at the weak first week and see exactly why the metric landed at 67 rather than 90.
+
 ---
 
-## What we verified
+## Why a shopkeeper would actually use it
 
-A ledger page carrying ten mixed Urdu-English entries was pushed through the full chain against live Alibaba Cloud infrastructure, with no stage stubbed:
+This is the question we think most AI-for-development projects fail. A credit score only pays off if a lender exists, and only at the moment you apply. So why photograph a page next Tuesday?
 
-- **12 of 12 lines** transcribed
-- **10 of 10 transactions** correctly typed
-- **71/100** scored, with a fluent Urdu explanation
+Three things now come out of the same upload, each answering a problem a shopkeeper has today:
 
-Classification held across the script boundary — چینی (sugar) to `sale`, ادھار (udhaar) to `credit_given`, واپسی (waapsi) to `repayment` — and customer names attached only to the credit and repayment rows, leaving walk-in sales anonymous.
+**The udhaar book.** Who owes what, derived from the credit and repayment lines already on the page. Repayments settle oldest-first, the way a shopkeeper works down a customer's page, so the age of a debt is real rather than being the first date on record. Spelling variants of a name are matched, so one person written two ways is one balance.
 
-### The most useful result was a failure
+**Reminders worth sending.** A polite Urdu message per debtor, ready to copy. Tone follows the age of the debt — no ageing at someone over fresh credit, a clear ask after two weeks, a request for a date after a month. Templated rather than generated, so it reads the same every time, costs nothing, and works with no connection. Nothing is ever sent on the shopkeeper's behalf.
 
-The vision model made two genuine transcription errors:
+**Trading history.** Sales, expenses, credit, repayments and net income by day, week, month or year.
 
-| On the page | Read as | What the structuring step recorded |
+Collecting an overdue balance also lifts the repayment ratio, which is 35% of the score. **Chasing udhaar and becoming creditworthy are the same action.** The pitch stops being "photograph your ledger and maybe get a loan someday" and becomes *track who owes you money, chase it, watch your trade — and build a credit history for free while you do it*.
+
+---
+
+## Showing the shopkeeper the loan, not just the score
+
+The whole point of a score is that a lender can act on it, yet until recently only the loan officer could see how close a shopkeeper was. That is now the other way round.
+
+At 69 out of 100 the dashboard says **"You are 1 point away"**, names the threshold, and shows the gap as a bar. Past it, the wording changes to what a lender could actually act on — an indicative facility derived from average monthly sales.
+
+The advice names the metric leaving the most score on the table, **weighted rather than lowest-first**. Revenue trend at 73.51 has only 6.6 points left in it; cash flow at 67.26 has 13.1, because it carries 40% of the weight. The repayment lever reads *"collect the udhaar you are owed"* — and the reminders to do exactly that are one tab away.
+
+The band thresholds are prototype defaults, not a lender's policy, and the page says so under the number. Shopkeeper and loan officer read the same bands from the same code, so the two are never shown different answers about the same score.
+
+---
+
+## What we measured
+
+A single successful run proves the pipeline connects. It does not tell you how often it is right. So we built twelve ledger pages designed to stress failure modes rather than flatter the model — dense, sparse, faded, rotated, noisy, Urdu-only, English-only, undated, two-column, and deliberately ambiguous — each with known ground truth.
+
+| Measure | Result |
+|---|---|
+| Transactions expected | 64 |
+| **Captured** | **64 — 100%** |
+| **Rows invented** | **0** |
+| **Type correct** | **61/62 — 98%** |
+| **Date correct** | **64/64 — 100%** |
+| Customer name correct | 25/26 — 96% |
+
+**Zero invented rows is the number to read first.** Across 64 opportunities the model never produced a transaction that was not on the page — including on the sparse page, which offered three entries and a lot of blank paper. For a credit product a fabricated sale is a worse failure than a missed one, because it inflates a score rather than understating it.
+
+The benchmark, its ground truth and its results are in [`benchmark/`](benchmark/) and can be re-run.
+
+**An honest limit:** these are rendered pages, not photographs. They vary layout, density, contrast, rotation, noise and script mix, but they do not reproduce real handwriting, paper texture, shadows or a creased page under a phone camera. Read the numbers as an upper bound. The next honest step is scoring photographs of genuine ledgers the same way.
+
+---
+
+## Being wrong, visibly
+
+In our live demo run the vision model made two genuine transcription errors:
+
+| On the page | Read as | What was recorded |
 |---|---|---|
 | دہی (yoghurt) | دبی (Dubai) | `cash sale of milk and dubai (likely dairy product)` |
 | آٹا (flour) | آئنا (non-word) | `expense for 10kg aina (likely flour or atta)` |
 
-Both rows were still typed correctly. Neither error was hidden and neither corrupted the ledger — the uncertainty travels with the row into the database, where a reviewer can see exactly which entries to check.
+Both rows were still typed correctly. The benchmark's single type error behaved the same way: on the deliberately ambiguous line **پرانا حساب — ادھار** the model returned `repayment` where we expected `credit_given`, noting *"likely customer repayment"*. That phrase honestly reads either way; a human bookkeeper would have to ask.
 
-A system that reads handwriting *will* misread handwriting. The design question is whether it tells you.
+**But flagging is only half the promise.** Telling a shopkeeper an entry might be wrong and giving them no way to fix it is not much better than hiding it. Flagged rows now form a short list they can act on — corrected, or confirmed as right after all. The list is ordered by how much damage each gap does: credit with no customer name ranks highest because it cannot be tracked against anyone at all; an unsure reading is next; a missing date is last. Corrections are validated before they touch the ledger, and because every figure is recalculated from these rows rather than stored, a correction moves the score, the balances and the history at once.
+
+The same caution governs name matching. A shortening attaches to the fullest spelling, and a one-character slip is forgiven — but matching on a *trailing* word is deliberately refused, because "Ali" and "Imran Ali" are very often two different customers, and putting one person's debt on another's name is far worse than showing two rows a shopkeeper can recognise. Every merge is labelled *"also written as"*.
 
 ---
 
-## Beyond the core pipeline
+## Reaching people who cannot read the explanation
 
-**A lender view.** The same evidence reframed for a loan officer: the score with its band, the three weighted metrics, and the ledger totals behind them — sales, expenses, credit extended, repaid and still outstanding. Where the band warrants it, an indicative facility ceiling is derived from average monthly sales, with the multiple and the measurement period stated on the page.
+Plenty of shopkeepers keep a khata confidently — figures, names, short entries — without reading a paragraph of formal Urdu comfortably. A score explained only in writing is a score explained to the wrong half of the audience, which for a financial inclusion product is the original problem repeating itself one layer up.
 
-**Authentication built properly.** Password (bcrypt at 12 rounds, with the 72-*byte* limit enforced correctly — 37 Urdu characters already exceed it), Google OAuth with account linking rather than duplication, and emailed single-use password reset. Reset requests answer identically whether or not an address is registered, so the endpoint cannot be used to discover accounts. Each account carries a `token_version` that increments on reset, so a password reset immediately evicts any session issued before it rather than leaving a stolen token valid for days.
+The score explanation and every reminder can be **played aloud**, using the device's own speech synthesis: no network, no cost, and the audio never leaves the phone. Where no Urdu voice is installed the button hides itself rather than reading Urdu script in an English voice, which is worse than silence.
+
+---
+
+## Also built
+
+**A lender view** at `/lender`: the same evidence reframed for a loan officer — score and band, the three weighted metrics, and the ledger totals behind them, with an indicative facility ceiling where the band warrants it.
+
+**Authentication built properly.** Password (bcrypt at 12 rounds, with the 72-*byte* limit enforced correctly — 37 Urdu characters already exceed it), Google OAuth with account linking rather than duplication, and emailed single-use password reset. Reset requests answer identically whether or not an address is registered, so the endpoint cannot be used to discover accounts. Each account carries a `token_version` that increments on reset, so a password reset immediately evicts any session issued before it.
 
 **Safe degradation everywhere.** Every external integration reports itself unavailable instead of crashing when its credentials are absent. Without a DashScope key each AI step returns a stated `skipped`. Without OSS credentials images go to local disk. Without Google credentials the sign-in button hides itself. Without SMTP the reset link goes to the server log.
 
@@ -88,7 +139,7 @@ A system that reads handwriting *will* misread handwriting. The design question 
 
 This is a feasibility prototype built to prove the pipeline is real. It is not a finished lending product, and no score it produces should decide a loan on its own. The lender view's band thresholds and facility multiples are illustrative defaults, not underwriting policy.
 
-Transcription accuracy has been measured on a small number of ledger pages, not at scale. Google sign-in is implemented but not switched on, since it needs OAuth client credentials. The OSS storage path is correct but has not been exercised against a live bucket; local disk is the tested route.
+Transcription accuracy has been measured on rendered pages, not photographs of real handwriting. Google sign-in is implemented but not switched on, since it needs OAuth client credentials. The OSS storage path is correct but has not been exercised against a live bucket; local disk is the tested route.
 
 We state these openly because a credit product that overclaims is worse than one that admits its limits.
 
@@ -96,7 +147,7 @@ We state these openly because a credit product that overclaims is worse than one
 
 ## What comes next
 
-Field-test transcription against many real ledgers across different handwriting and page layouts. Calibrate the metric weights with an actual lending partner rather than choosing them ourselves. Put the uncertainty flags in front of a human reviewer as a first-class workflow, so the "uncertain" rows become a queue rather than a note.
+Field-test transcription against photographs of real ledgers across different handwriting and page layouts. Calibrate the metric weights with an actual lending partner rather than choosing them ourselves. Add voice entry, so a shopkeeper who cannot comfortably write can speak an entry — the natural counterpart to being able to hear the explanation.
 
 ---
 
@@ -107,4 +158,4 @@ Field-test transcription against many real ledgers across different handwriting 
 **AI** Qwen-VL-Plus and Qwen-Plus via Alibaba Cloud Model Studio, OpenAI-compatible endpoint, `ap-southeast-1`
 **Storage** Alibaba Cloud OSS with a local-disk fallback
 
-Running instructions and the full API surface are in [README.md](README.md).
+Nineteen API routes, five tables, 135 tests. Running instructions and the full API surface are in [README.md](README.md).
