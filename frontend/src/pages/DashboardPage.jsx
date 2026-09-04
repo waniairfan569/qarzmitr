@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { AlertTriangle, BarChart3, Landmark, LoaderCircle, RefreshCw, WalletCards } from 'lucide-react'
 import { api } from '../api/client'
 import AppShell from '../components/AppShell'
+import CustomerBalances from '../components/CustomerBalances'
 import LedgerWorkflow from '../components/LedgerWorkflow'
 import ScoreCard from '../components/ScoreCard'
 import ScoreChart from '../components/ScoreChart'
@@ -20,13 +21,23 @@ export default function DashboardPage() {
   const [transactionLoading, setTransactionLoading] = useState(false)
   const [error, setError] = useState('')
   const [transactionError, setTransactionError] = useState('')
+  const [customers, setCustomers] = useState(null)
+  const [customerError, setCustomerError] = useState('')
 
   const loadDashboard = useCallback(async () => {
     setError('')
+    setCustomerError('')
     try {
-      const result = await api.dashboard(token)
+      const [result, customerResult] = await Promise.all([
+        api.dashboard(token),
+        api.customers(token).catch((requestError) => {
+          if (requestError.status !== 401) setCustomerError(requestError.message)
+          return null
+        }),
+      ])
       setDashboard(result)
       setTransactions(result.transactions)
+      setCustomers(customerResult)
       setFilter('')
     } catch (requestError) {
       if (requestError.status === 401) logout()
@@ -104,6 +115,8 @@ export default function DashboardPage() {
           <p className="mt-5 border-t border-ink/10 pt-5 text-xs leading-5 text-ink/70">The score itself is calculated by <strong className="font-bold text-leaf">deterministic backend code</strong>. AI only explains the result in Urdu.</p>
         </section>
       </div>
+
+      <div className="mt-6"><CustomerBalances data={customers} error={customerError} /></div>
 
       <div className="mt-6"><LedgerWorkflow onDataChanged={loadDashboard} /></div>
       <div className="mt-6"><TransactionTable transactions={transactions} filter={filter} onFilter={changeFilter} loading={transactionLoading} error={transactionError} /></div>

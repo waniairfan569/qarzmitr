@@ -1,4 +1,5 @@
 const { db } = require('../db/database');
+const { buildCustomerBalances } = require('../services/customers');
 
 const VALID_TRANSACTION_TYPES = new Set([
   'sale',
@@ -92,7 +93,20 @@ function getTransactions(req, res, next) {
   }
 }
 
+function getCustomers(req, res, next) {
+  try {
+    if (!userExists(req.userId)) {
+      return res.status(401).json({ message: 'User account no longer exists.' });
+    }
+
+    return res.json(buildCustomerBalances(fetchTransactions(req.userId)));
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
+  getCustomers,
   getDashboard,
   getTransactions
 };

@@ -46,6 +46,7 @@ export const api = {
     body: { token, password },
   }),
   dashboard: (token) => request('/dashboard', { token }),
+  customers: (token) => request('/customers', { token }),
   transactions: (token, type = '') => request(`/transactions${type ? `?type=${encodeURIComponent(type)}` : ''}`, { token }),
   upload: (token, file) => {
     const form = new FormData()

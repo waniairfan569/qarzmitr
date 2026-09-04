@@ -1,5 +1,5 @@
 const express = require('express');
-const { getDashboard, getTransactions } = require('../controllers/dashboardController');
+const { getCustomers, getDashboard, getTransactions } = require('../controllers/dashboardController');
 const { scoreUser } = require('../controllers/scoreController');
 const { structureLedger } = require('../controllers/structureController');
 const { uploadImage, uploadLedger } = require('../controllers/uploadController');
@@ -13,5 +13,6 @@ router.post('/structure', structureLedger);
 router.post('/score', scoreUser);
 router.get('/dashboard', getDashboard);
 router.get('/transactions', getTransactions);
+router.get('/customers', getCustomers);
 
 module.exports = router;
