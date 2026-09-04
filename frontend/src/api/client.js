@@ -56,7 +56,14 @@ export const api = {
     body: patch,
   }),
   summary: (token, period = 'month') => request(`/summary?period=${encodeURIComponent(period)}`, { token }),
-  transactions: (token, type = '') => request(`/transactions${type ? `?type=${encodeURIComponent(type)}` : ''}`, { token }),
+  transactions: (token, { type, from, to } = {}) => {
+    const query = new URLSearchParams()
+    if (type) query.set('type', type)
+    if (from) query.set('from', from)
+    if (to) query.set('to', to)
+    const suffix = query.toString()
+    return request(`/transactions${suffix ? `?${suffix}` : ''}`, { token })
+  },
   upload: (token, file) => {
     const form = new FormData()
     form.append('image', file)

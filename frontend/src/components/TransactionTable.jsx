@@ -1,5 +1,6 @@
 import { AlertTriangle, BookOpen, LoaderCircle } from 'lucide-react'
 import { useT } from '../i18n'
+import DateRangeFilter from './DateRangeFilter'
 
 const FILTERS = [
   { value: '', label: 'All entries' },
@@ -11,6 +12,10 @@ const FILTERS = [
 
 const TYPE_LABELS = Object.fromEntries(FILTERS.slice(1).map(({ value, label }) => [value, label.replace(/s$/, '')]))
 
+function money(value) {
+  return new Intl.NumberFormat('en-PK', { maximumFractionDigits: 0 }).format(Number(value || 0))
+}
+
 function formatAmount(value) {
   return new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 }).format(Number(value))
 }
@@ -20,7 +25,7 @@ function formatDate(value) {
   return new Intl.DateTimeFormat('en-PK', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(`${value}T00:00:00`))
 }
 
-export default function TransactionTable({ transactions, filter, onFilter, loading, error }) {
+export default function TransactionTable({ transactions, totals, filter, onFilter, range, onRange, loading, error }) {
   const t = useT()
   return (
     <section className="card overflow-hidden">
@@ -28,14 +33,29 @@ export default function TransactionTable({ transactions, filter, onFilter, loadi
         <div>
           <div className="section-kicker">{t(`txn.kicker`)}</div>
           <h2 className="mt-2 font-display text-3xl">{t(`txn.title`)}</h2>
-          <p className="mt-2 text-sm text-ink/50">{transactions.length} {transactions.length === 1 ? 'entry' : 'entries'} in this view</p>
+          {totals && (
+            <p className="mt-2 text-sm text-ink/60">
+              {t(`txn.rangeTotals`, {
+                count: totals.count,
+                sales: money(totals.sale),
+                expenses: money(totals.expense),
+                net: money(totals.net),
+              })}
+            </p>
+          )}
+          {(range?.from || range?.to) && (
+            <p className="mt-1 text-xs text-ink/45">{t(`txn.undatedNote`)}</p>
+          )}
         </div>
-        <label className="block">
-          <span className="sr-only">{t(`txn.type`)}</span>
-          <select className="select-field" value={filter} onChange={(event) => onFilter(event.target.value)} disabled={loading}>
-            {FILTERS.map((item) => <option key={item.value} value={item.value}>{item.value ? t(`type.${item.value}`) : t(`type.all`)}</option>)}
-          </select>
-        </label>
+        <div className="flex flex-col items-start gap-3">
+          <DateRangeFilter value={range} onChange={onRange} disabled={loading} />
+          <label className="block">
+            <span className="sr-only">{t(`txn.type`)}</span>
+            <select className="select-field" value={filter} onChange={(event) => onFilter(event.target.value)} disabled={loading}>
+              {FILTERS.map((item) => <option key={item.value} value={item.value}>{item.value ? t(`type.${item.value}`) : t(`type.all`)}</option>)}
+            </select>
+          </label>
+        </div>
       </div>
 
       {error && (
@@ -48,8 +68,10 @@ export default function TransactionTable({ transactions, filter, onFilter, loadi
       ) : transactions.length === 0 ? (
         <div className="grid min-h-64 place-content-center px-6 text-center">
           <BookOpen className="mx-auto text-saffron" size={30} />
-          <p className="mt-4 font-display text-2xl text-ink/45">{t(`txn.empty`)}</p>
-          <p className="mt-2 text-sm text-ink/45">Upload and process a ledger to bring the record to life.</p>
+          {/* An empty ledger and an empty date range are different problems. */}
+          <p className="mt-4 font-display text-2xl text-ink/45">
+            {range?.from || range?.to ? t(`txn.noneInRange`) : t(`txn.empty`)}
+          </p>
         </div>
       ) : (
         <div className="overflow-x-auto">

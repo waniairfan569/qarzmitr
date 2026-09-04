@@ -32,6 +32,8 @@ export default function DashboardPage() {
   const [dashboard, setDashboard] = useState(EMPTY_DASHBOARD)
   const [transactions, setTransactions] = useState([])
   const [filter, setFilter] = useState('')
+  const [range, setRange] = useState({ preset: 'all', from: '', to: '' })
+  const [totals, setTotals] = useState(null)
   const [loading, setLoading] = useState(true)
   const [transactionLoading, setTransactionLoading] = useState(false)
   const [error, setError] = useState('')
@@ -76,13 +78,19 @@ export default function DashboardPage() {
     loadDashboard()
   }, [loadDashboard])
 
-  async function changeFilter(nextFilter) {
+  async function loadTransactions(nextFilter, nextRange) {
     setFilter(nextFilter)
+    setRange(nextRange)
     setTransactionLoading(true)
     setTransactionError('')
     try {
-      const result = await api.transactions(token, nextFilter)
+      const result = await api.transactions(token, {
+        type: nextFilter,
+        from: nextRange.from,
+        to: nextRange.to,
+      })
       setTransactions(result.transactions)
+      setTotals(result.totals || null)
     } catch (requestError) {
       if (requestError.status === 401) logout()
       else setTransactionError(requestError.message)
@@ -209,7 +217,16 @@ export default function DashboardPage() {
             <ReviewQueue refreshKey={refreshKey} onCorrected={loadDashboard} />
           </div>
           <div role="tabpanel" id="panel-transactions" aria-labelledby="tab-transactions" hidden={tab !== 'transactions'}>
-            <TransactionTable transactions={transactions} filter={filter} onFilter={changeFilter} loading={transactionLoading} error={transactionError} />
+            <TransactionTable
+              transactions={transactions}
+              totals={totals}
+              filter={filter}
+              onFilter={(nextFilter) => loadTransactions(nextFilter, range)}
+              range={range}
+              onRange={(nextRange) => loadTransactions(filter, nextRange)}
+              loading={transactionLoading}
+              error={transactionError}
+            />
           </div>
         </div>
       </div>
