@@ -95,7 +95,7 @@ export default function LedgerWorkflow({ onDataChanged }) {
           <div className="relative">
             <div className="section-kicker">New evidence</div>
             <h2 className="mt-3 max-w-sm font-display text-4xl leading-tight">Turn one ledger page into financial proof.</h2>
-            <p className="mt-4 max-w-md text-sm leading-6 text-ink/65">Photograph the whole page in good light. We preserve uncertain entries instead of hiding them.</p>
+            <p className="mt-4 max-w-md text-sm leading-6 text-ink/65">Photograph the whole page in good light. Anything read uncertainly is flagged rather than hidden, and listed under <strong className="font-bold text-ink/80">To check</strong> for you to correct.</p>
 
             <input ref={inputRef} className="sr-only" type="file" name="image" accept="image/jpeg,image/png,image/webp" onChange={chooseFile} />
             <button type="button" className="upload-drop mt-7 w-full" onClick={() => inputRef.current?.click()}>
