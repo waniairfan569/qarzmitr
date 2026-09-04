@@ -51,3 +51,24 @@ curl -X POST http://localhost:3000/structure \
 
 Transcription is not deterministic, so the wording of the notes will vary between runs.
 The transaction types and amounts should not.
+
+---
+
+## Two sample ledgers for a demo
+
+| File | What it shows |
+|---|---|
+| `sample-ledger-growth.png` | Four rising days plus three repayments. Uploading it against the seeded demo record moves the score **69 → 85**, which crosses the band threshold so the card turns green. |
+| `sample-ledger-full.png` | One page that exercises every part of the app at once. |
+
+`sample-ledger-full.png` was built so a single upload lights up every panel:
+
+- **All four transaction types** — sale, expense, credit given, repayment
+- **A customer who still owes** — Nasreen, 1,200 outstanding at 15 days, which is old enough to change the reminder's tone from gentle to direct
+- **A customer who has settled** — Imran Ali, 1,200 lent and 1,200 returned
+- **A name written two ways** — the full name on the credit line, the short form on the repayment, matched into one balance and labelled *"also written as"*
+- **Two credit lines with no customer name** — the highest-severity entry in the review queue, because credit that names nobody cannot be tracked
+- **One line with no date** — the lowest-severity entry, left out of the weekly figures rather than placed in a guessed week
+- **Three trading weeks**, one of them negative, so the history has something to show
+
+Verified against the live pipeline: 10 of 10 transactions parsed, and every panel populated as intended.

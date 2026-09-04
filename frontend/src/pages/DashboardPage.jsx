@@ -38,10 +38,14 @@ export default function DashboardPage() {
   const [customerError, setCustomerError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
   const [tab, setTab] = useState('udhaar')
+  const [refreshing, setRefreshing] = useState(false)
+  const [refreshedAt, setRefreshedAt] = useState(null)
 
   const loadDashboard = useCallback(async () => {
     setError('')
     setCustomerError('')
+    setRefreshing(true)
+    setRefreshedAt(null)
     try {
       const [result, customerResult] = await Promise.all([
         api.dashboard(token),
@@ -61,6 +65,8 @@ export default function DashboardPage() {
       else setError(requestError.message)
     } finally {
       setLoading(false)
+      setRefreshing(false)
+      setRefreshedAt(new Date())
     }
   }, [logout, token])
 
@@ -97,9 +103,23 @@ export default function DashboardPage() {
           <h1 className="mt-3 max-w-3xl font-display text-4xl leading-[0.98] md:text-6xl">Salaam, {user?.name?.split(' ')[0]}.</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/55">Your paper trail, translated into a financial profile you can understand and stand behind.</p>
         </div>
-        <div className="flex flex-wrap gap-3 self-start md:self-auto">
-          <Link className="secondary-button" to="/lender"><Landmark size={15} /> Lender view</Link>
-          <button type="button" className="secondary-button" onClick={loadDashboard}><RefreshCw size={15} /> Refresh record</button>
+        <div className="flex flex-col items-start gap-2 self-start md:items-end md:self-auto">
+          <div className="flex flex-wrap gap-3">
+            <Link className="secondary-button" to="/lender"><Landmark size={15} /> Lender view</Link>
+            <button type="button" className="secondary-button" onClick={loadDashboard} disabled={refreshing}>
+              {refreshing
+                ? <><LoaderCircle className="animate-spin" size={15} /> Refreshing…</>
+                : <><RefreshCw size={15} /> Refresh record</>}
+            </button>
+          </div>
+          {/* Without this the button did its work in silence and looked broken. */}
+          <p className="min-h-4 text-xs text-ink/45" aria-live="polite">
+            {refreshing
+              ? 'Reading your latest entries…'
+              : refreshedAt
+                ? `Updated ${refreshedAt.toLocaleTimeString()} · ${dashboard.transactions.length} entries`
+                : ''}
+          </p>
         </div>
       </header>
 
