@@ -40,6 +40,8 @@ export const api = {
   login: (credentials) => request('/auth/login', { method: 'POST', body: credentials }),
   me: (token) => request('/auth/me', { token }),
   providers: () => request('/auth/providers'),
+  requestPhoneCode: (phone) => request('/auth/phone/request', { method: 'POST', body: { phone } }),
+  verifyPhoneCode: (body) => request('/auth/phone/verify', { method: 'POST', body }),
   forgotPassword: (email) => request('/auth/forgot-password', { method: 'POST', body: { email } }),
   resetPassword: (token, password) => request('/auth/reset-password', {
     method: 'POST',

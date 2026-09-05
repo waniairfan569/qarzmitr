@@ -428,6 +428,25 @@ export const STRINGS = {
   'how.trust3': ['Your score explanation and reminders can be read aloud.', 'اسکور کی وضاحت اور یاد دہانیاں سنی بھی جا سکتی ہیں۔'],
   'how.trust4': ['A lender view shows the same evidence, never a different answer.', 'قرض دینے والے کو وہی ثبوت دکھتا ہے، کوئی الگ جواب نہیں۔'],
 
+  // ---- phone sign-in ----
+  'phone.tab': ['Phone', 'فون'],
+  'phone.emailTab': ['Email', 'ای میل'],
+  'phone.label': ['Mobile number', 'موبائل نمبر'],
+  'phone.hint': ['We send a six-digit code by SMS. No email needed.', 'ہم SMS پر چھ ہندسوں کا کوڈ بھیجتے ہیں۔ ای میل کی ضرورت نہیں۔'],
+  'phone.send': ['Send code', 'کوڈ بھیجیں'],
+  'phone.sending': ['Sending…', 'بھیجا جا رہا ہے…'],
+  'phone.codeLabel': ['Six-digit code', 'چھ ہندسوں کا کوڈ'],
+  'phone.sentTo': ['Code sent to {phone}', '{phone} پر کوڈ بھیج دیا'],
+  'phone.verify': ['Sign in', 'داخل ہوں'],
+  'phone.verifying': ['Checking…', 'جانچا جا رہا ہے…'],
+  'phone.change': ['Change number', 'نمبر بدلیں'],
+  'phone.resend': ['Send a new code', 'نیا کوڈ بھیجیں'],
+  'phone.nameLabel': ['Your name', 'آپ کا نام'],
+  'phone.shopLabel': ['Shop name', 'دکان کا نام'],
+  'phone.optional': ['optional', 'اختیاری'],
+  'phone.newHere': ['First time? Fill these in and your account is made when the code is verified.', 'پہلی بار؟ یہ بھر دیں — کوڈ درست ہوتے ہی کھاتہ بن جائے گا۔'],
+  'phone.noSms': ['No SMS gateway is configured in this prototype, so the code appears in the server log.', 'اس نمونے میں SMS گیٹ وے نہیں لگا، اس لیے کوڈ سرور لاگ میں آتا ہے۔'],
+
   // ---- footer ----
   'footer.prototype': [
     'QarzMitr is a feasibility prototype, not a final lending decision.',

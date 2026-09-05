@@ -7,8 +7,11 @@ const {
   signup
 } = require('../controllers/authController');
 const google = require('../controllers/googleController');
+const phone = require('../controllers/phoneController');
 const {
   loginLimiter,
+  otpRequestLimiter,
+  otpVerifyLimiter,
   passwordResetLimiter,
   resetConfirmLimiter,
   signupLimiter
@@ -21,6 +24,8 @@ router.post('/signup', signupLimiter, signup);
 router.post('/login', loginLimiter, login);
 router.post('/forgot-password', passwordResetLimiter, forgotPassword);
 router.post('/reset-password', resetConfirmLimiter, resetPassword);
+router.post('/phone/request', otpRequestLimiter, phone.requestCode);
+router.post('/phone/verify', otpVerifyLimiter, phone.verifyCode);
 router.get('/providers', google.status);
 router.get('/google', google.start);
 router.get('/google/callback', google.callback);

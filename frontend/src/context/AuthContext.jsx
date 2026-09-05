@@ -82,7 +82,8 @@ export function AuthProvider({ children }) {
     logout,
     resetPassword,
     acceptToken,
-  }), [token, user, restoring, login, signup, logout, resetPassword, acceptToken])
+    acceptSession,
+  }), [token, user, restoring, login, signup, logout, resetPassword, acceptToken, acceptSession])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

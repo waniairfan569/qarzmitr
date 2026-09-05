@@ -34,6 +34,8 @@ const env = {
   smtpPassword: process.env.SMTP_PASSWORD,
   smtpSecure: process.env.SMTP_SECURE === 'true',
   mailFrom: process.env.MAIL_FROM || 'QarzMitr <no-reply@qarzmitr.local>',
+  smsApiKey: process.env.SMS_API_KEY,
+  smsSender: process.env.SMS_SENDER,
   passwordResetTtlMinutes: Number.parseInt(process.env.PASSWORD_RESET_TTL_MINUTES || '30', 10) || 30,
   port: Number.isInteger(parsedPort) && parsedPort > 0 ? parsedPort : 3000
 };

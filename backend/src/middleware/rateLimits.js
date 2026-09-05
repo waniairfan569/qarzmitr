@@ -50,6 +50,31 @@ const resetConfirmLimiter = rateLimit({
   handler: message('Too many attempts. Wait a few minutes and try again.')
 });
 
+/**
+ * Asking for an SMS code. Left open this sends messages at someone else's
+ * expense and pesters a number that never asked for them.
+ */
+const otpRequestLimiter = rateLimit({
+  windowMs: 60 * MINUTE,
+  limit: 5,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  handler: message('Too many code requests. Try again in an hour.')
+});
+
+/**
+ * Entering a code. Each code already retires itself after five wrong guesses;
+ * this stops an attacker cycling through fresh codes to keep guessing.
+ */
+const otpVerifyLimiter = rateLimit({
+  windowMs: 15 * MINUTE,
+  limit: 15,
+  skipSuccessfulRequests: true,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  handler: message('Too many attempts. Wait a few minutes and try again.')
+});
+
 /** Signup: enough for a family sharing a shop, not enough to fill the database. */
 const signupLimiter = rateLimit({
   windowMs: 60 * MINUTE,
@@ -73,6 +98,8 @@ const uploadLimiter = rateLimit({
 
 module.exports = {
   loginLimiter,
+  otpRequestLimiter,
+  otpVerifyLimiter,
   passwordResetLimiter,
   resetConfirmLimiter,
   signupLimiter,

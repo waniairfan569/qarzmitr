@@ -67,6 +67,16 @@ function initializeDatabase() {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
 
+    CREATE TABLE IF NOT EXISTS phone_otps (
+      id TEXT PRIMARY KEY,
+      phone TEXT NOT NULL,
+      code_hash TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      used_at TEXT,
+      attempts INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS password_reset_tokens (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL,
@@ -92,10 +102,16 @@ function initializeDatabase() {
   addColumnIfMissing('users', 'google_id', 'TEXT');
   // Bumped on password reset so tokens issued before the reset stop verifying.
   addColumnIfMissing('users', 'token_version', 'INTEGER NOT NULL DEFAULT 0');
+  // Stored in full international form so one person cannot end up with two
+  // accounts by writing 0300… once and +92300… the next time.
+  addColumnIfMissing('users', 'phone', 'TEXT');
 
   db.exec(`
     CREATE UNIQUE INDEX IF NOT EXISTS idx_users_google_id
       ON users(google_id) WHERE google_id IS NOT NULL;
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_users_phone
+      ON users(phone) WHERE phone IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_phone_otps_phone ON phone_otps(phone);
   `);
 }
 
