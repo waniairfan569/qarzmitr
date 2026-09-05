@@ -155,7 +155,7 @@ export default function DashboardPage() {
           every time a feature is added. All four stay mounted and are hidden
           rather than unmounted, so switching is instant and nothing refetches. */}
       <div className="mt-8">
-        <div className="flex flex-wrap gap-1 rounded-2xl bg-ink/[0.06] p-1.5" role="tablist" aria-label={t(`tab.aria`)}>
+        <div className="flex gap-1 overflow-x-auto rounded-2xl bg-ink/[0.06] p-1.5 sm:flex-wrap sm:overflow-visible" role="tablist" aria-label={t(`tab.aria`)}>
           {TABS.map(({ id, icon: Icon }) => (
             <button
               key={id}
@@ -164,7 +164,7 @@ export default function DashboardPage() {
               id={`tab-${id}`}
               aria-selected={tab === id}
               aria-controls={`panel-${id}`}
-              className={`inline-flex flex-1 min-w-[140px] items-center justify-center gap-2 rounded-xl px-4 py-3 text-xs font-bold transition ${
+              className={`inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-3 text-xs font-bold transition sm:flex-1 sm:shrink sm:min-w-[140px] ${
                 tab === id ? 'bg-cream text-ink shadow-[0_2px_10px_rgba(23,57,52,.08)]' : 'text-ink/55 hover:text-ink'
               }`}
               onClick={() => setTab(id)}

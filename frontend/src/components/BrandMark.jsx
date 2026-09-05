@@ -10,7 +10,7 @@ export default function BrandMark({ inverse = false }) {
       </div>
       <div>
         <p className={`font-display text-xl leading-none ${inverse ? 'text-paper' : 'text-ink'}`}>QarzMitr</p>
-        <p className={`mt-1 text-[9px] font-bold uppercase tracking-[0.22em] ${inverse ? 'text-paper/55' : 'text-ink/45'}`}>{t(`brand.tagline`)}</p>
+        <p className={`mt-1 hidden text-[9px] font-bold uppercase tracking-[0.22em] sm:block ${inverse ? 'text-paper/55' : 'text-ink/45'}`}>{t(`brand.tagline`)}</p>
       </div>
     </div>
   )

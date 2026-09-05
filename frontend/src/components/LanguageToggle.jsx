@@ -17,14 +17,14 @@ export default function LanguageToggle({ inverse = false }) {
 
   return (
     <div className={`flex items-center gap-1 rounded-full p-1 ${shell}`} role="group" aria-label="Language / زبان">
-      <Languages className={inverse ? 'ms-1.5 text-paper/50' : 'ms-1.5 text-ink/40'} size={14} aria-hidden="true" />
+      <Languages className={`ms-1.5 hidden sm:block ${inverse ? 'text-paper/50' : 'text-ink/40'}`} size={14} aria-hidden="true" />
       {LANGUAGES.map((option) => (
         <button
           key={option.id}
           type="button"
           lang={option.id}
           aria-pressed={language === option.id}
-          className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${language === option.id ? active : idle}`}
+          className={`rounded-full px-2.5 py-1.5 text-xs font-bold transition sm:px-3 ${language === option.id ? active : idle}`}
           onClick={() => setLanguage(option.id)}
         >
           {option.short}
