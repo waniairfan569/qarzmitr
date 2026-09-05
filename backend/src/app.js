@@ -10,6 +10,9 @@ const verifyToken = require('./middleware/verifyToken');
 const app = express();
 
 app.disable('x-powered-by');
+// Trust one proxy hop so the limiter sees the real client address rather than
+// the load balancer's, which would put every user in the same bucket.
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '1mb' }));
 app.use(cors({
   origin: env.frontendOrigin,

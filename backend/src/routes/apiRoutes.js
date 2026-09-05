@@ -11,12 +11,13 @@ const { scoreUser } = require('../controllers/scoreController');
 const { structureLedger } = require('../controllers/structureController');
 const { uploadImage, uploadLedger } = require('../controllers/uploadController');
 const { getReview, updateTransaction } = require('../controllers/reviewController');
+const { uploadLimiter } = require('../middleware/rateLimits');
 const verifyToken = require('../middleware/verifyToken');
 
 const router = express.Router();
 
 router.use(verifyToken);
-router.post('/upload', uploadImage, uploadLedger);
+router.post('/upload', uploadLimiter, uploadImage, uploadLedger);
 router.post('/structure', structureLedger);
 router.post('/score', scoreUser);
 router.get('/dashboard', getDashboard);
