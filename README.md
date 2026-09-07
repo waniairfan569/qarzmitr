@@ -73,6 +73,14 @@ Both rows were still typed correctly. A system that reads handwriting *will* mis
 
 ---
 
+## Read by the person it is for
+
+The product exists for a shopkeeper who may never have used a banking app. An interface only in English would repeat the original problem one layer up — so the whole interface switches between **English and Urdu** from a toggle in the header, not just the AI's explanation. Every one of the 302 interface strings has an Urdu translation; the page flips to right-to-left, and currency renders as `روپے` rather than `PKR`.
+
+For anyone who keeps a khata confidently without reading formal Urdu prose, the score explanation and every reminder can be **played aloud** through the device's own speech synthesis — no network, no cost, and the audio never leaves the phone. Where no Urdu voice is installed the button hides itself rather than reading Urdu script in an English accent.
+
+---
+
 ## Running it
 
 Requires Node 18+.
@@ -101,7 +109,7 @@ Sign in with the seeded account:
 | Password | `Demo1234!` |
 
 ```bash
-npm test                      # 135 tests, backend
+npm test                      # 153 tests, backend
 ```
 
 ### Configuration
@@ -115,18 +123,24 @@ Only `JWT_SECRET` is strictly required. Every integration below degrades safely 
 | `OSS_*` (4 values) | Ledger images stored in Alibaba OSS | Stored on local disk |
 | `GOOGLE_*` (3 values) | Google sign-in | Button hidden, endpoint returns 503 |
 | `SMTP_*` | Emailed password reset links | Link written to the server log |
+| `SMS_*` | Phone sign-in codes delivered by SMS | Code written to the server log |
 
 ---
 
 ## Authentication
 
-Three ways into one account record:
+Four ways into one account record:
 
 - **Password** — bcrypt at 12 rounds, with the 72-*byte* limit enforced correctly (37 Urdu characters already exceed it)
 - **Google** — server-side OAuth; a Google login matching an existing email claims that account rather than duplicating it, and the original password keeps working
+- **Phone** — a six-digit SMS code to a Pakistani number, normalised to `+92XXXXXXXXXX` so `0300…`, `+92 300…` and `0092…` reach one account rather than three
 - **Reset link** — emailed, single-use, valid 30 minutes, stored SHA-256 hashed
 
 Reset requests answer identically whether or not the address is registered, so the endpoint cannot be used to discover accounts. Each account carries a `token_version` that increments on reset and is checked on every authenticated request — so a password reset immediately evicts any session issued before it, rather than leaving a stolen JWT valid for days.
+
+Sign-in codes are stored SHA-256 hashed and bound to the number they were sent to, so a code captured for one phone cannot be replayed against another, and a code retires after five wrong guesses rather than allowing an unlimited grind at six digits.
+
+None of that helps if guessing is free, so the endpoints worth attacking are rate limited — login 10 per 15 minutes with successful attempts not counted against the budget, password reset and code requests 5 per hour, signup 8 per hour. `helmet` sets the security headers, JSON bodies are capped at 256 KB, and the app trusts exactly one proxy hop so a load balancer cannot place every user in the same bucket.
 
 ---
 
@@ -141,6 +155,8 @@ Reset requests answer identically whether or not the address is registered, so t
 | GET | `/auth/providers` | — | Which sign-in methods are configured |
 | GET | `/auth/google` | — | Begin Google sign-in |
 | GET | `/auth/google/callback` | — | Complete it |
+| POST | `/auth/phone/request` | — | Send a sign-in code by SMS |
+| POST | `/auth/phone/verify` | — | Exchange the code for a JWT |
 | GET | `/auth/me` | token | Current user |
 | POST | `/upload` | token | Store a ledger photo, transcribe it |
 | POST | `/structure` | token | Text → typed transactions |
@@ -163,7 +179,7 @@ Reset requests answer identically whether or not the address is registered, so t
 **AI** Qwen-VL-Plus and Qwen-Plus via Alibaba Cloud Model Studio (OpenAI-compatible endpoint, `ap-southeast-1`)
 **Storage** Alibaba Cloud OSS, with a local-disk fallback
 
-Five tables — `users`, `ledgers`, `transactions`, `scores`, `password_reset_tokens`. 135 tests, run with `npm test`. Scores are written as new rows rather than updates, so the trend line is real history rather than a reconstruction.
+Six tables — `users`, `ledgers`, `transactions`, `scores`, `password_reset_tokens`, `phone_otps`. 153 tests, run with `npm test`. Scores are written as new rows rather than updates, so the trend line is real history rather than a reconstruction.
 
 ---
 
@@ -173,9 +189,9 @@ This is a **feasibility prototype built to prove the pipeline is real**, not a f
 
 Known gaps, stated plainly:
 
-- Google sign-in is implemented but not switched on — it needs OAuth client credentials
+- Transcription accuracy is measured on rendered ledger pages, not photographs of real handwriting — read those numbers as an upper bound
 - The OSS storage path is correct but has not been exercised against a live bucket; local disk is the tested route
-- Transcription accuracy has been measured on a small number of ledger pages, not at scale
+- SMS and email delivery fall back to the server log unless a gateway is configured
 
 ---
 

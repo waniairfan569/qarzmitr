@@ -39,7 +39,7 @@ Finally the finished score is handed to Qwen-Plus, which explains it to the shop
 
 The scoring maths runs entirely in ordinary backend code. It is deterministic — the same ledger in any row order returns an identical number — and it is auditable line by line. A language model is used only to *read* the handwriting and to *explain* the finished result. It is never asked what the score should be.
 
-This matters because the obvious question about any AI credit product is "how do I know this isn't a hallucinated number?" Our answer is structural rather than reassuring: the model was never given the option. We back it with 135 automated tests, one of which pins the exact score from our live demo run so a regression in the formula fails loudly.
+This matters because the obvious question about any AI credit product is "how do I know this isn't a hallucinated number?" Our answer is structural rather than reassuring: the model was never given the option. We back it with 153 automated tests, one of which pins the exact score from our live demo run so a regression in the formula fails loudly.
 
 Three further choices follow from the same principle:
 
@@ -129,9 +129,13 @@ The score explanation and every reminder can be **played aloud**, using the devi
 
 **A lender view** at `/lender`: the same evidence reframed for a loan officer — score and band, the three weighted metrics, and the ledger totals behind them, with an indicative facility ceiling where the band warrants it.
 
-**Authentication built properly.** Password (bcrypt at 12 rounds, with the 72-*byte* limit enforced correctly — 37 Urdu characters already exceed it), Google OAuth with account linking rather than duplication, and emailed single-use password reset. Reset requests answer identically whether or not an address is registered, so the endpoint cannot be used to discover accounts. Each account carries a `token_version` that increments on reset, so a password reset immediately evicts any session issued before it.
+**An interface in the reader's own language.** Both audiences are real and they do not overlap: an assessor reads English, a shopkeeper reads Urdu. The entire interface switches between the two from a header toggle — all 302 strings translated, the page flipping to right-to-left, currency rendering as `روپے` rather than `PKR` — so neither audience is reading a translation of the other's screen.
 
-**Safe degradation everywhere.** Every external integration reports itself unavailable instead of crashing when its credentials are absent. Without a DashScope key each AI step returns a stated `skipped`. Without OSS credentials images go to local disk. Without Google credentials the sign-in button hides itself. Without SMTP the reset link goes to the server log.
+**Authentication built properly.** Password (bcrypt at 12 rounds, with the 72-*byte* limit enforced correctly — 37 Urdu characters already exceed it), Google OAuth with account linking rather than duplication, phone sign-in by SMS code, and emailed single-use password reset. Reset requests answer identically whether or not an address is registered, so the endpoint cannot be used to discover accounts. Each account carries a `token_version` that increments on reset, so a password reset immediately evicts any session issued before it. Phone numbers are normalised to `+92XXXXXXXXXX`, so `0300…`, `+92 300…` and `0092…` reach one account rather than three; codes are stored hashed, bound to the number they were sent to, and retire after five wrong guesses.
+
+**Hardened where guessing is cheap.** Login is limited to 10 attempts per 15 minutes with successful ones not counted, password reset and code requests to 5 per hour, signup to 8 per hour. `helmet` sets the security headers, JSON bodies are capped at 256 KB, and exactly one proxy hop is trusted so a load balancer cannot put every user in one bucket.
+
+**Safe degradation everywhere.** Every external integration reports itself unavailable instead of crashing when its credentials are absent. Without a DashScope key each AI step returns a stated `skipped`. Without OSS credentials images go to local disk. Without Google credentials the sign-in button hides itself. Without SMTP the reset link, and without an SMS gateway the sign-in code, goes to the server log instead.
 
 ---
 
@@ -139,7 +143,7 @@ The score explanation and every reminder can be **played aloud**, using the devi
 
 This is a feasibility prototype built to prove the pipeline is real. It is not a finished lending product, and no score it produces should decide a loan on its own. The lender view's band thresholds and facility multiples are illustrative defaults, not underwriting policy.
 
-Transcription accuracy has been measured on rendered pages, not photographs of real handwriting. Google sign-in is implemented but not switched on, since it needs OAuth client credentials. The OSS storage path is correct but has not been exercised against a live bucket; local disk is the tested route.
+Transcription accuracy has been measured on rendered pages, not photographs of real handwriting. The OSS storage path is correct but has not been exercised against a live bucket; local disk is the tested route. SMS delivery falls back to the server log unless a gateway is configured.
 
 We state these openly because a credit product that overclaims is worse than one that admits its limits.
 
@@ -158,4 +162,4 @@ Field-test transcription against photographs of real ledgers across different ha
 **AI** Qwen-VL-Plus and Qwen-Plus via Alibaba Cloud Model Studio, OpenAI-compatible endpoint, `ap-southeast-1`
 **Storage** Alibaba Cloud OSS with a local-disk fallback
 
-Nineteen API routes, five tables, 135 tests. Running instructions and the full API surface are in [README.md](README.md).
+Twenty-one API routes, six tables, 153 tests. Running instructions and the full API surface are in [README.md](README.md).
