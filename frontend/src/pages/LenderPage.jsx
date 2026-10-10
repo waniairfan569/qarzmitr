@@ -165,7 +165,7 @@ export default function LenderPage() {
                 <strong className={`mt-2 block font-display text-7xl leading-none ${assessment.band.tone}`}>
                   {data.latestScore.score}
                 </strong>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink/45">{t(`lender.outOf`)}</span>
+                <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-ink/45">{t(`lender.outOf`)}</span>
                 {assessment.delta !== null && (
                   <p className={`mt-4 inline-flex items-center gap-1.5 text-xs font-bold ${assessment.delta < 0 ? 'text-coral' : 'text-leaf'}`}>
                     {assessment.delta < 0 ? <TrendingDown size={14} /> : <TrendingUp size={14} />}

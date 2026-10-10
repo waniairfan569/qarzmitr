@@ -1,5 +1,5 @@
 import { AlertTriangle, BookOpen, LoaderCircle } from 'lucide-react'
-import { useT } from '../i18n'
+import { useLanguage, useMoney } from '../i18n'
 import DateRangeFilter from './DateRangeFilter'
 import Pagination, { usePaged } from './Pagination'
 
@@ -11,23 +11,17 @@ const FILTERS = [
   { value: 'repayment', label: 'Repayments' },
 ]
 
-const TYPE_LABELS = Object.fromEntries(FILTERS.slice(1).map(({ value, label }) => [value, label.replace(/s$/, '')]))
-
 function money(value) {
   return new Intl.NumberFormat('en-PK', { maximumFractionDigits: 0 }).format(Number(value || 0))
 }
 
-function formatAmount(value) {
-  return new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 }).format(Number(value))
-}
-
-function formatDate(value) {
-  if (!value) return 'Date not captured'
-  return new Intl.DateTimeFormat('en-PK', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(`${value}T00:00:00`))
+function formatDate(value, isUrdu) {
+  return new Intl.DateTimeFormat(isUrdu ? 'ur-PK' : 'en-PK', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(`${value}T00:00:00`))
 }
 
 export default function TransactionTable({ transactions, totals, filter, onFilter, range, onRange, loading, error }) {
-  const t = useT()
+  const { t, isUrdu } = useLanguage()
+  const pkr = useMoney()
   const paged = usePaged(transactions)
 
   return (
@@ -97,10 +91,13 @@ export default function TransactionTable({ transactions, totals, filter, onFilte
                 const uncertain = transaction.note?.toLowerCase().includes('uncertain')
                 return (
                   <tr key={transaction.id} className="transition-colors hover:bg-saffron/[0.06]">
-                    <td className="px-6 py-5 md:px-8"><span className={`type-pill type-${transaction.type}`}>{TYPE_LABELS[transaction.type] || transaction.type}</span></td>
-                    <td className="px-5 py-5 font-mono text-sm font-bold">{formatAmount(transaction.amount)}</td>
+                    <td className="px-6 py-5 md:px-8"><span className={`type-pill type-${transaction.type}`}>{t(`type.${transaction.type}`)}</span></td>
+                    <td className="px-5 py-5 font-mono text-sm font-bold">{pkr(transaction.amount)}</td>
                     <td className="px-5 py-5 text-sm font-semibold">{transaction.customer_name || '—'}</td>
-                    <td className="px-5 py-5 text-sm text-ink/55">{formatDate(transaction.transaction_date)}</td>
+                    <td className="px-5 py-5 text-sm text-ink/55">{transaction.transaction_date
+                      // bdi keeps day, month and year in order inside right-to-left text.
+                      ? <bdi>{formatDate(transaction.transaction_date, isUrdu)}</bdi>
+                      : t(`txn.noDate`)}</td>
                     <td className="max-w-xs px-6 py-5 text-sm text-ink/55 md:px-8">
                       <span className="inline-flex items-start gap-2">{uncertain && <AlertTriangle className="mt-0.5 shrink-0 text-saffron-dark" size={14} />}{transaction.note || '—'}</span>
                     </td>

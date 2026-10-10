@@ -55,6 +55,19 @@ export default function ScoreCard({ latestScore }) {
           <p className="mt-5 text-sm leading-6 text-ink/75">{t(`score.note`)}<strong className="font-bold text-leaf">{t(`score.noteStrong`)}</strong></p>
         </div>
       </div>
+      {/* The three parts the score is built from, so the number is never shown without its reasons. */}
+      <dl className="mt-7 grid gap-3 border-t border-ink/10 pt-5 sm:grid-cols-3">
+        {[
+          [`lender.metric.cashflow`, latestScore.cash_flow_consistency, `40%`],
+          [`lender.metric.repayment`, latestScore.repayment_ratio, `35%`],
+          [`lender.metric.revenue`, latestScore.revenue_trend, `25%`],
+        ].map(([label, value, weight]) => (
+          <div key={label}>
+            <dt className="text-xs font-semibold text-ink/60">{t(label)} <span className="text-ink/40">· {weight}</span></dt>
+            <dd className="mt-1 font-display text-2xl">{value == null ? `—` : Number(value).toFixed(1)}</dd>
+          </div>
+        ))}
+      </dl>
     </section>
   )
 }

@@ -89,7 +89,7 @@ export default function PeriodHistory({ refreshKey }) {
         <>
           <div className="mt-7 grid gap-3 sm:grid-cols-3">
             <Tile label={t(`hist.totalSales`)} value={pkr(data.totals.sales)} />
-            <Tile label={t(`hist.average`, { period: t(`hist.${period}`) })} value={pkr(data.average_net)} />
+            <Tile label={t(`hist.average`, { period: t(`hist.unit.${period}`) })} value={pkr(data.average_net)} />
             <Tile label={t(`hist.best`)} value={data.best_period?.label || '—'} sub={data.best_period ? t(`hist.netLabel`, { net: pkr(data.best_period.net) }) : ''} />
           </div>
 
