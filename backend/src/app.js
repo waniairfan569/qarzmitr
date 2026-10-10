@@ -1,4 +1,3 @@
-const path = require('path');
 const cors = require('cors');
 const express = require('express');
 const helmet = require('helmet');
@@ -33,7 +32,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use('/uploads', verifyToken, express.static(path.resolve(__dirname, '../uploads'), {
+// Unauthenticated so the host's health check can tell a live server from a dead one.
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
+app.use('/uploads', verifyToken, express.static(env.uploadsDir, {
   dotfiles: 'deny',
   index: false
 }));

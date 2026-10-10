@@ -36,7 +36,10 @@ const env = {
   mailFrom: process.env.MAIL_FROM || 'QarzMitr <no-reply@qarzmitr.local>',
   smsApiKey: process.env.SMS_API_KEY,
   smsSender: process.env.SMS_SENDER,
-  passwordResetTtlMinutes: Number.parseInt(process.env.PASSWORD_RESET_TTL_MINUTES || '30', 10) || 30,
+  // Locally-stored ledger photos. Point this at a persistent disk in production,
+  // or every redeploy loses the images behind existing ledgers.
+  uploadsDir: path.resolve(__dirname, '../..', process.env.UPLOADS_DIR || './uploads'),
+  passwordResetTtlMinutes:Number.parseInt(process.env.PASSWORD_RESET_TTL_MINUTES || '30', 10) || 30,
   port: Number.isInteger(parsedPort) && parsedPort > 0 ? parsedPort : 3000
 };
 

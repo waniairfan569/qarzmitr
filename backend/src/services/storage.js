@@ -3,8 +3,7 @@ const path = require('path');
 const OSS = require('ali-oss');
 const { env } = require('../config/env');
 
-const backendRoot = path.resolve(__dirname, '../..');
-const uploadsDirectory = path.join(backendRoot, 'uploads');
+const uploadsDirectory = env.uploadsDir;
 
 const extensionByMimeType = {
   'image/jpeg': 'jpg',

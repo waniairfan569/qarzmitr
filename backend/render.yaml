@@ -10,8 +10,7 @@ services:
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
-    # The app currently has no public health route; see DEPLOYMENT.md before relying on this check.
-    healthCheckPath: /
+    healthCheckPath: /health
     autoDeploy: true
     disk:
       name: qarzmitr-data
@@ -19,16 +18,16 @@ services:
       sizeGB: 1
     envVars:
       - key: JWT_SECRET
-        sync: false
+        generateValue: true
+      # The Vercel URL, e.g. https://qarzmitr.vercel.app (no trailing slash)
       - key: FRONTEND_ORIGIN
         sync: false
+      # Both live on the persistent disk so a redeploy keeps accounts and photos.
       - key: DATABASE_URL
-        sync: false
+        value: /opt/render/project/src/data/qarzmitr.sqlite
+      - key: UPLOADS_DIR
+        value: /opt/render/project/src/data/uploads
       - key: DASHSCOPE_API_KEY
         sync: false
-      - key: OSS_ACCESS_KEY_ID
-        sync: false
-      - key: OSS_ACCESS_KEY_SECRET
-        sync: false
-      - key: OSS_BUCKET_NAME
+      - key: DASHSCOPE_BASE_URL
         sync: false
