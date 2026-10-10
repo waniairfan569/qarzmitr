@@ -8,7 +8,7 @@ const STRUCTURE_SYSTEM_PROMPT = `You are a financial data assistant. You will re
 Each transaction must have:
 - "type": one of "sale", "expense", "credit_given", "repayment"
 - "amount": a number (PKR, no currency symbol)
-- "customer_name": string or null if not mentioned
+- "customer_name": the customer's name written in English (Roman) letters, e.g. "Imran Ali" for عمران علی, or null if not mentioned
 - "date": string in YYYY-MM-DD if a date is present, else null
 - "note": short English summary of what the line meant
 

@@ -241,6 +241,10 @@ function readResponseText(responseBody) {
   return '';
 }
 
+// Smaller models now and then emit a stray Hangul or CJK character mid-word
+// ("کری딧" for "کریڈٹ"). No Urdu explanation should contain one.
+const FOREIGN_SCRIPT = /[ᄀ-ᇿ⺀-鿿가-힯豈-﫿]/;
+
 async function generateScoreExplanation(metrics) {
   if (!env.dashscopeApiKey) {
     return {
@@ -250,6 +254,21 @@ async function generateScoreExplanation(metrics) {
     };
   }
 
+  const first = await requestScoreExplanation(metrics);
+  if (!FOREIGN_SCRIPT.test(first.explanationText)) {
+    return first;
+  }
+
+  // Ask once more; if that fails or is also garbled, keep the first answer
+  // with the stray characters removed rather than failing the whole score.
+  const second = await requestScoreExplanation(metrics).catch(() => null);
+  if (second && !FOREIGN_SCRIPT.test(second.explanationText)) {
+    return second;
+  }
+  return { ...first, explanationText: first.explanationText.replace(new RegExp(FOREIGN_SCRIPT, 'g'), '') };
+}
+
+async function requestScoreExplanation(metrics) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
