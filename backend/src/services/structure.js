@@ -1,4 +1,5 @@
 const { env } = require('../config/env');
+const { fetchWithRetry } = require('./modelRequest');
 
 const DASHSCOPE_URL = `${env.dashscopeBaseUrl}/chat/completions`;
 const STRUCTURE_MODEL = env.textModel;
@@ -82,7 +83,7 @@ async function structureLedgerText(rawOcrText) {
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetch(DASHSCOPE_URL, {
+    const response = await fetchWithRetry(DASHSCOPE_URL, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${env.dashscopeApiKey}`,

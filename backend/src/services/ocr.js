@@ -1,4 +1,5 @@
 const { env } = require('../config/env');
+const { fetchWithRetry } = require('./modelRequest');
 
 const DASHSCOPE_URL = `${env.dashscopeBaseUrl}/chat/completions`;
 const OCR_SYSTEM_PROMPT = 'You are an OCR assistant specialized in reading handwritten Urdu and mixed Urdu-English shopkeeper ledgers. Extract all visible text exactly as written, preserving line breaks. Do not translate. Do not summarize. If a word is unclear, mark it as [unclear] rather than guessing.';
@@ -44,7 +45,7 @@ async function extractLedgerText({ buffer, mimeType }) {
   const imageUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
   try {
-    const response = await fetch(DASHSCOPE_URL, {
+    const response = await fetchWithRetry(DASHSCOPE_URL, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${env.dashscopeApiKey}`,
