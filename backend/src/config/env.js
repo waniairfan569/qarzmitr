@@ -19,6 +19,9 @@ function normalizeOssRegion(region) {
 const env = {
   dashscopeApiKey: process.env.DASHSCOPE_API_KEY,
   dashscopeBaseUrl: (process.env.DASHSCOPE_BASE_URL || 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1').replace(/\/+$/, ''),
+  // Any OpenAI-compatible provider works if these name its models.
+  visionModel: process.env.VISION_MODEL || 'qwen-vl-plus',
+  textModel: process.env.TEXT_MODEL || 'qwen-plus',
   frontendOrigin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
   jwtSecret: process.env.JWT_SECRET,
   ossAccessKeyId: process.env.OSS_ACCESS_KEY_ID,

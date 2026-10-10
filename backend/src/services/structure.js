@@ -1,7 +1,7 @@
 const { env } = require('../config/env');
 
 const DASHSCOPE_URL = `${env.dashscopeBaseUrl}/chat/completions`;
-const STRUCTURE_MODEL = 'qwen-plus';
+const STRUCTURE_MODEL = env.textModel;
 const STRUCTURE_SYSTEM_PROMPT = `You are a financial data assistant. You will receive raw, messy text extracted from a handwritten shopkeeper ledger written in Urdu, English, or a mix. Convert it into a structured JSON array of transactions.
 
 Each transaction must have:

@@ -1,7 +1,7 @@
 const { env } = require('../config/env');
 
 const DASHSCOPE_URL = `${env.dashscopeBaseUrl}/chat/completions`;
-const SCORING_EXPLANATION_MODEL = 'qwen-plus';
+const SCORING_EXPLANATION_MODEL = env.textModel;
 const EXPLANATION_SYSTEM_PROMPT = 'You are a financial assistant explaining a credit score to a small shopkeeper in simple, respectful Urdu. Do not use technical jargon. Be encouraging but honest. Keep it to 3-4 sentences.';
 const REQUEST_TIMEOUT_MS = 45_000;
 const DAY_MS = 24 * 60 * 60 * 1000;

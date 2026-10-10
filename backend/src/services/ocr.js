@@ -51,7 +51,7 @@ async function extractLedgerText({ buffer, mimeType }) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'qwen-vl-plus',
+        model: env.visionModel,
         messages: [
           { role: 'system', content: OCR_SYSTEM_PROMPT },
           {
