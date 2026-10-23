@@ -6,6 +6,7 @@ import AppShell from '../components/AppShell'
 import CustomerBalances from '../components/CustomerBalances'
 import LedgerWorkflow from '../components/LedgerWorkflow'
 import ListenButton from '../components/ListenButton'
+import LoanOptions from '../components/LoanOptions'
 import LoanReadiness from '../components/LoanReadiness'
 import PaymentReminders from '../components/PaymentReminders'
 import PeriodHistory from '../components/PeriodHistory'
@@ -146,6 +147,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-6"><LoanReadiness refreshKey={refreshKey} /></div>
+      <div className="mt-6"><LoanOptions refreshKey={refreshKey} /></div>
 
       {/* The upload is the whole point of the product, so it sits directly under
           the score rather than below every panel the score produced. */}

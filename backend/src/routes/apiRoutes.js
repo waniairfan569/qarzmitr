@@ -7,11 +7,12 @@ const {
   getSummary,
   getTransactions
 } = require('../controllers/dashboardController');
+const { getLoanOptions, getShares, postRevokeShare, postShare } = require('../controllers/loanController');
 const { scoreUser } = require('../controllers/scoreController');
 const { structureLedger } = require('../controllers/structureController');
 const { uploadImage, uploadLedger } = require('../controllers/uploadController');
 const { getReview, updateTransaction } = require('../controllers/reviewController');
-const { uploadLimiter } = require('../middleware/rateLimits');
+const { shareCreateLimiter, uploadLimiter } = require('../middleware/rateLimits');
 const verifyToken = require('../middleware/verifyToken');
 
 const router = express.Router();
@@ -28,5 +29,9 @@ router.get('/reminders', getReminders);
 router.get('/summary', getSummary);
 router.get('/review', getReview);
 router.patch('/transactions/:id', updateTransaction);
+router.get('/loan-options', getLoanOptions);
+router.get('/shares', getShares);
+router.post('/shares', shareCreateLimiter, postShare);
+router.post('/shares/:id/revoke', postRevokeShare);
 
 module.exports = router;

@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const { env } = require('./config/env');
 const authRoutes = require('./routes/authRoutes');
 const apiRoutes = require('./routes/apiRoutes');
+const sharedRoutes = require('./routes/sharedRoutes');
 const { errorHandler, notFound } = require('./middleware/errorHandlers');
 const verifyToken = require('./middleware/verifyToken');
 
@@ -42,6 +43,7 @@ app.use('/uploads', verifyToken, express.static(env.uploadsDir, {
   index: false
 }));
 app.use('/auth', authRoutes);
+app.use('/shared', sharedRoutes);
 app.use('/', apiRoutes);
 
 app.use(notFound);

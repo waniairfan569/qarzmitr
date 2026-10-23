@@ -77,4 +77,13 @@ export const api = {
     body: { ledger_id: ledgerId },
   }),
   score: (token) => request('/score', { method: 'POST', token }),
+  loanOptions: (token, amount) => request(`/loan-options${amount ? `?amount=${encodeURIComponent(amount)}` : ''}`, { token }),
+  shares: (token) => request('/shares', { token }),
+  createShare: (token, lenderId) => request('/shares', {
+    method: 'POST',
+    token,
+    body: { lender_id: lenderId, consent: true },
+  }),
+  revokeShare: (token, id) => request(`/shares/${encodeURIComponent(id)}/revoke`, { method: 'POST', token }),
+  sharedStatement: (shareToken) => request(`/shared/${encodeURIComponent(shareToken)}`),
 }

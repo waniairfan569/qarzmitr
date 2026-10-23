@@ -96,12 +96,35 @@ const uploadLimiter = rateLimit({
   handler: message('Too many ledger uploads in one hour. Try again shortly.')
 });
 
+/**
+ * Shared statements are public to whoever holds the link. A lender opening one
+ * a few times is fine; a script trying tokens is not.
+ */
+const sharedStatementLimiter = rateLimit({
+  windowMs: 15 * MINUTE,
+  limit: 60,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  handler: message('Too many requests for shared statements. Try again shortly.')
+});
+
+/** Making share links. Far above what one shopkeeper needs in an hour. */
+const shareCreateLimiter = rateLimit({
+  windowMs: 60 * MINUTE,
+  limit: 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  handler: message('Too many share links made in one hour. Try again later.')
+});
+
 module.exports = {
   loginLimiter,
   otpRequestLimiter,
   otpVerifyLimiter,
   passwordResetLimiter,
   resetConfirmLimiter,
+  shareCreateLimiter,
+  sharedStatementLimiter,
   signupLimiter,
   uploadLimiter
 };

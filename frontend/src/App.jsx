@@ -8,6 +8,7 @@ import LenderPage from './pages/LenderPage'
 import LoginPage from './pages/LoginPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import OverviewPage from './pages/OverviewPage'
+import SharedStatementPage from './pages/SharedStatementPage'
 import SignupPage from './pages/SignupPage'
 
 function ProtectedRoute() {
@@ -29,6 +30,8 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/auth/google" element={<GoogleCallbackPage />} />
+      {/* Public: a lender opening a link a shopkeeper sent them has no account. */}
+      <Route path="/s/:token" element={<SharedStatementPage />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/lender" element={<LenderPage />} />

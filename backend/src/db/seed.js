@@ -112,6 +112,7 @@ function seedDatabase(passwordHash) {
       `).run(existingUser.id, existingUser.id);
       db.prepare('DELETE FROM scores WHERE user_id = ?').run(existingUser.id);
       db.prepare('DELETE FROM password_reset_tokens WHERE user_id = ?').run(existingUser.id);
+      db.prepare('DELETE FROM statement_shares WHERE user_id = ?').run(existingUser.id);
       db.prepare('DELETE FROM ledgers WHERE user_id = ?').run(existingUser.id);
       db.prepare('DELETE FROM users WHERE id = ?').run(existingUser.id);
     }

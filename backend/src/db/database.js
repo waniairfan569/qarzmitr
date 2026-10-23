@@ -87,7 +87,23 @@ function initializeDatabase() {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
 
+    -- A link a shopkeeper chose to send a lender. Only the token's hash is
+    -- stored, the link expires, and the shopkeeper can withdraw it.
+    CREATE TABLE IF NOT EXISTS statement_shares (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      lender_id TEXT NOT NULL,
+      token_hash TEXT NOT NULL UNIQUE,
+      expires_at TEXT NOT NULL,
+      revoked_at TEXT,
+      view_count INTEGER NOT NULL DEFAULT 0,
+      last_viewed_at TEXT,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_ledgers_user_id ON ledgers(user_id);
+    CREATE INDEX IF NOT EXISTS idx_statement_shares_user_id ON statement_shares(user_id);
     CREATE INDEX IF NOT EXISTS idx_transactions_ledger_id ON transactions(ledger_id);
     CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
     CREATE INDEX IF NOT EXISTS idx_scores_user_id ON scores(user_id);

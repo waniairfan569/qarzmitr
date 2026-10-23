@@ -180,21 +180,23 @@ function getSummary(req, res, next) {
   }
 }
 
+function fetchLatestScore(userId) {
+  return db.prepare(`
+    SELECT score, cash_flow_consistency, repayment_ratio, revenue_trend, computed_at
+    FROM scores
+    WHERE user_id = ?
+    ORDER BY datetime(computed_at) DESC, computed_at DESC, id DESC
+    LIMIT 1
+  `).get(userId);
+}
+
 function getReadiness(req, res, next) {
   try {
     if (!userExists(req.userId)) {
       return res.status(401).json({ message: 'User account no longer exists.' });
     }
 
-    const latest = db.prepare(`
-      SELECT score, cash_flow_consistency, repayment_ratio, revenue_trend, computed_at
-      FROM scores
-      WHERE user_id = ?
-      ORDER BY datetime(computed_at) DESC, computed_at DESC, id DESC
-      LIMIT 1
-    `).get(req.userId);
-
-    return res.json(buildReadiness(latest, fetchTransactions(req.userId)));
+    return res.json(buildReadiness(fetchLatestScore(req.userId), fetchTransactions(req.userId)));
   } catch (error) {
     return next(error);
   }
@@ -215,10 +217,13 @@ function getReminders(req, res, next) {
 }
 
 module.exports = {
+  fetchLatestScore,
+  fetchTransactions,
   getCustomers,
   getReadiness,
   getReminders,
   getSummary,
   getDashboard,
-  getTransactions
+  getTransactions,
+  userExists
 };

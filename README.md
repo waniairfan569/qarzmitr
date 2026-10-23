@@ -109,7 +109,7 @@ Sign in with the seeded account:
 | Password | `Demo1234!` |
 
 ```bash
-npm test                      # 153 tests, backend
+npm test                      # 172 tests, backend
 ```
 
 ### Configuration
@@ -169,6 +169,11 @@ None of that helps if guessing is free, so the endpoints worth attacking are rat
 | GET | `/review` | token | Entries worth checking, worst gap first |
 | PATCH | `/transactions/:id` | token | Correct a flagged entry, or confirm it |
 | GET | `/transactions` | token | Transaction list, filterable |
+| GET | `/loan-options` | token | Each lender matched against the score and ledger history: eligible, almost (and what is missing), or not yet |
+| POST | `/shares` | token | Make a 7-day statement link for one lender, only with `consent: true` |
+| GET | `/shares` | token | Links made, how often each was opened |
+| POST | `/shares/:id/revoke` | token | Withdraw a link |
+| GET | `/shared/:token` | — | The statement a lender opens, with customer names replaced |
 
 ---
 
@@ -179,7 +184,7 @@ None of that helps if guessing is free, so the endpoints worth attacking are rat
 **AI** Qwen-VL-Plus and Qwen-Plus via Alibaba Cloud Model Studio (OpenAI-compatible endpoint, `ap-southeast-1`)
 **Storage** Alibaba Cloud OSS, with a local-disk fallback
 
-Six tables — `users`, `ledgers`, `transactions`, `scores`, `password_reset_tokens`, `phone_otps`. 153 tests, run with `npm test`. Scores are written as new rows rather than updates, so the trend line is real history rather than a reconstruction.
+Seven tables — `users`, `ledgers`, `transactions`, `scores`, `password_reset_tokens`, `phone_otps`, `statement_shares`. 172 tests, run with `npm test`. Scores are written as new rows rather than updates, so the trend line is real history rather than a reconstruction.
 
 ---
 
