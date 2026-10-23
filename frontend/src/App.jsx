@@ -33,7 +33,7 @@ export default function App() {
       {/* Public: a lender opening a link a shopkeeper sent them has no account. */}
       <Route path="/s/:token" element={<SharedStatementPage />} />
       <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard/:section?" element={<DashboardPage />} />
         <Route path="/lender" element={<LenderPage />} />
         <Route path="/overview" element={<OverviewPage />} />
       </Route>

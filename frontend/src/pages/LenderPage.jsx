@@ -43,7 +43,7 @@ export default function LenderPage() {
     <AppShell>
       <div className="mx-auto w-full">
         <div className="no-print flex flex-wrap items-center justify-between gap-4">
-          <Link className="text-button inline-flex items-center gap-2" to="/dashboard">
+          <Link className="text-button inline-flex items-center gap-2" to="/dashboard/loans">
             <ArrowLeft size={15} /> {t(`lender.back`)}
           </Link>
           {data?.latestScore && (
