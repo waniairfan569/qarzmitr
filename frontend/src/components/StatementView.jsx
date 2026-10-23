@@ -61,7 +61,8 @@ function buildAssessment(transactions, latestScore, scoreHistory) {
     facility: monthlySales * band.multiple,
     delta,
     customers: new Set(transactions.map((transaction) => transaction.customer_name).filter(Boolean)).size,
-    ledgerPages: new Set(transactions.map((transaction) => transaction.ledger_id).filter(Boolean)).size
+    ledgerPages: new Set(transactions.map((transaction) => transaction.ledger_id).filter(Boolean)).size,
+    manual: transactions.filter((transaction) => transaction.source === 'manual').length
   }
 }
 
@@ -163,6 +164,7 @@ export default function StatementView({ data, owner, notice }) {
               <Row label={t(`lender.row.customers`)} value={assessment.customers} />
               <Row label={t(`lender.row.period`)} value={assessment.firstDay ? `${assessment.firstDay} → ${assessment.lastDay}` : t(`lender.undated`)} />
               <Row label={t(`lender.row.runs`)} value={data.scoreHistory.length} />
+            <Row label={t(`lender.row.manual`)} value={`${assessment.manual} / ${data.transactions.length}`} />
               <Row label={t(`lender.row.sales`)} value={pkr(assessment.sales)} />
               <Row label={t(`lender.row.expenses`)} value={pkr(assessment.expenses)} />
               <Row label={t(`lender.row.credit`)} value={pkr(assessment.creditGiven)} />

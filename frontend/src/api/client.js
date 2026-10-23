@@ -52,6 +52,8 @@ export const api = {
   reminders: (token) => request('/reminders', { token }),
   readiness: (token) => request('/readiness', { token }),
   review: (token) => request('/review', { token }),
+  addTransaction: (token, entry) => request('/transactions', { method: 'POST', token, body: entry }),
+  deleteTransaction: (token, id) => request(`/transactions/${encodeURIComponent(id)}`, { method: 'DELETE', token }),
   correctTransaction: (token, id, patch) => request(`/transactions/${encodeURIComponent(id)}`, {
     method: 'PATCH',
     token,

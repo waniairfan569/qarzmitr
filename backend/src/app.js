@@ -29,7 +29,7 @@ app.use(helmet({
 app.use(express.json({ limit: '256kb' }));
 app.use(cors({
   origin: env.frontendOrigin,
-  methods: ['GET', 'POST', 'PATCH', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 

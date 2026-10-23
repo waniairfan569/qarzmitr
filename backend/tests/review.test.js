@@ -121,7 +121,7 @@ describe('validatePatch', () => {
       amount: '1250',
       customer_name: '  Nasreen Bibi ',
       transaction_date: '2026-09-02'
-    });
+    }, { today: new Date('2026-09-15T12:00:00Z') });
 
     assert.equal(error, undefined);
     assert.deepEqual(patch, {
@@ -144,6 +144,13 @@ describe('validatePatch', () => {
   it('refuses a date that does not exist', () => {
     assert.match(validatePatch({ transaction_date: '2026-02-30' }).error, /does not exist/);
     assert.match(validatePatch({ transaction_date: '02-09-2026' }).error, /YYYY-MM-DD/);
+  });
+
+  it('refuses a date decades or months away, as the upload does', () => {
+    const today = new Date('2026-10-24T12:00:00Z');
+    assert.match(validatePatch({ transaction_date: '1986-10-03' }, { today }).error, /last year/);
+    assert.match(validatePatch({ transaction_date: '2026-12-25' }, { today }).error, /week ahead/);
+    assert.equal(validatePatch({ transaction_date: '2026-10-03' }, { today }).patch.transaction_date, '2026-10-03');
   });
 
   it('allows a date to be cleared', () => {

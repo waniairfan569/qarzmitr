@@ -11,7 +11,7 @@ const { getLoanOptions, getShares, postRevokeShare, postShare } = require('../co
 const { scoreUser } = require('../controllers/scoreController');
 const { structureLedger } = require('../controllers/structureController');
 const { uploadImage, uploadLedger } = require('../controllers/uploadController');
-const { getReview, updateTransaction } = require('../controllers/reviewController');
+const { createTransaction, deleteTransaction, getReview, updateTransaction } = require('../controllers/reviewController');
 const { shareCreateLimiter, uploadLimiter } = require('../middleware/rateLimits');
 const verifyToken = require('../middleware/verifyToken');
 
@@ -28,7 +28,9 @@ router.get('/readiness', getReadiness);
 router.get('/reminders', getReminders);
 router.get('/summary', getSummary);
 router.get('/review', getReview);
+router.post('/transactions', createTransaction);
 router.patch('/transactions/:id', updateTransaction);
+router.delete('/transactions/:id', deleteTransaction);
 router.get('/loan-options', getLoanOptions);
 router.get('/shares', getShares);
 router.post('/shares', shareCreateLimiter, postShare);

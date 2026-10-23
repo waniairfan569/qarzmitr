@@ -48,6 +48,11 @@ export default function DashboardPage() {
   const [recordTab, setRecordTab] = useState('history')
   const [refreshing, setRefreshing] = useState(false)
   const [refreshedAt, setRefreshedAt] = useState(null)
+  // Typed or edited entries change the record but not the saved score, which
+  // costs a model call to recompute, so the shopkeeper chooses when.
+  const [scoreStale, setScoreStale] = useState(false)
+  const [rescoring, setRescoring] = useState(false)
+  const [rescoreMessage, setRescoreMessage] = useState('')
 
   const loadDashboard = useCallback(async () => {
     setError('')
@@ -86,6 +91,28 @@ export default function DashboardPage() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [section])
+
+  async function entriesChanged() {
+    await loadDashboard()
+    if (range.from || range.to) await loadTransactions('', range)
+    setScoreStale(true)
+    setRescoreMessage('')
+  }
+
+  async function rescore() {
+    setRescoring(true)
+    setRescoreMessage('')
+    try {
+      const result = await api.score(token)
+      setScoreStale(false)
+      setRescoreMessage(t(`rescore.done`, { score: result.score }))
+      await loadDashboard()
+    } catch (requestError) {
+      setRescoreMessage(requestError.data?.reason || requestError.message)
+    } finally {
+      setRescoring(false)
+    }
+  }
 
   async function loadTransactions(nextFilter, nextRange) {
     setFilter(nextFilter)
@@ -244,6 +271,19 @@ export default function DashboardPage() {
         <>
           <SectionHeader id="records" />
           {errorBanner}
+          {(scoreStale || rescoreMessage) && (
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-saffron/40 bg-saffron/[0.12] p-4 text-sm" role="status">
+              <span>
+                {scoreStale ? <><strong>{t(`rescore.title`)}.</strong> {t(`rescore.body`)}</> : rescoreMessage}
+                {scoreStale && rescoreMessage && <span className="mt-1 block text-coral">{rescoreMessage}</span>}
+              </span>
+              {scoreStale && (
+                <button type="button" className="primary-button !min-h-10 !px-4 !text-xs" onClick={rescore} disabled={rescoring}>
+                  {rescoring ? <><LoaderCircle className="animate-spin" size={15} /> {t(`rescore.updating`)}</> : <><RefreshCw size={15} /> {t(`rescore.button`)}</>}
+                </button>
+              )}
+            </div>
+          )}
           <div className="flex gap-1 rounded-2xl bg-ink/[0.06] p-1.5" role="tablist" aria-label={t(`tab.aria`)}>
             {RECORD_TABS.map(({ id, icon: Icon }) => (
               <button
@@ -276,6 +316,7 @@ export default function DashboardPage() {
                 onRange={(nextRange) => loadTransactions(filter, nextRange)}
                 loading={transactionLoading}
                 error={transactionError}
+                onChanged={entriesChanged}
               />
             </div>
           </div>

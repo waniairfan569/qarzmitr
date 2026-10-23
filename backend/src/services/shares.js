@@ -82,7 +82,7 @@ function buildSharedStatement(userId) {
     ORDER BY datetime(computed_at) ASC, computed_at ASC, id ASC
   `).all(userId);
   const rows = db.prepare(`
-    SELECT type, amount, customer_name, transaction_date, ledger_id
+    SELECT type, amount, customer_name, transaction_date, ledger_id, source
     FROM transactions
     WHERE user_id = ?
     ORDER BY transaction_date DESC

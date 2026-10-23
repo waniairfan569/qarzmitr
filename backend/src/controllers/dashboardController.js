@@ -17,7 +17,7 @@ function userExists(userId) {
 
 function fetchTransactions(userId) {
   return db.prepare(`
-    SELECT id, ledger_id, user_id, type, amount, customer_name, transaction_date, note, created_at
+    SELECT id, ledger_id, user_id, type, amount, customer_name, transaction_date, note, source, created_at
     FROM transactions
     WHERE user_id = ?
     ORDER BY transaction_date DESC, created_at DESC, id DESC
@@ -47,7 +47,7 @@ function fetchFilteredTransactions(userId, { type, from, to }) {
   }
 
   return db.prepare(`
-    SELECT id, ledger_id, user_id, type, amount, customer_name, transaction_date, note, created_at
+    SELECT id, ledger_id, user_id, type, amount, customer_name, transaction_date, note, source, created_at
     FROM transactions
     WHERE ${clauses.join(' AND ')}
     ORDER BY transaction_date DESC, created_at DESC, id DESC
