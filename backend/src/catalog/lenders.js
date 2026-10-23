@@ -20,6 +20,18 @@ const LENDERS = [
     documents: ['cnic', 'guarantors']
   },
   {
+    // Interest-free loans under its Qarz-e-Hasna / Mawakhat microfinance programme.
+    id: 'alkhidmat',
+    name: 'Alkhidmat Foundation',
+    name_ur: 'الخدمت فاؤنڈیشن',
+    type: 'interest_free',
+    website: 'https://alkhidmat.org',
+    min_score: 50,
+    min_months: 2,
+    max_loan: 100000,
+    documents: ['cnic', 'guarantors']
+  },
+  {
     id: 'kashf',
     name: 'Kashf Foundation',
     name_ur: 'کشف فاؤنڈیشن',
