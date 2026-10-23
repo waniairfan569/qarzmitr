@@ -9,6 +9,8 @@
 const UNCERTAIN_NOTE = /uncertain|unclear|likely|assum|probabl|possibly|\?/i;
 const NEEDS_A_NAME = new Set(['credit_given', 'repayment']);
 
+const { isPlausibleDate } = require('./dates');
+
 function isIsoDate(value) {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
@@ -18,7 +20,7 @@ function isIsoDate(value) {
  * A credit line with no name cannot be chased or repaid against at all, so it
  * outranks a row that is merely undated.
  */
-function reasonsFor(transaction) {
+function reasonsFor(transaction, today = new Date()) {
   const reasons = [];
 
   if (NEEDS_A_NAME.has(transaction.type) && !String(transaction.customer_name || '').trim()) {
@@ -27,6 +29,17 @@ function reasonsFor(transaction) {
       severity: 'high',
       label: 'No customer name',
       detail: 'Credit and repayments need a name, otherwise this cannot be tracked against anyone.'
+    });
+  }
+
+  // A year read wrong puts a whole page decades away and drags every weekly
+  // figure with it, so it ranks with a missing name.
+  if (isIsoDate(transaction.transaction_date) && !isPlausibleDate(transaction.transaction_date, today)) {
+    reasons.push({
+      code: 'unlikely_date',
+      severity: 'high',
+      label: 'Date looks wrong',
+      detail: `Read as ${transaction.transaction_date}. Check the year written on the page.`
     });
   }
 

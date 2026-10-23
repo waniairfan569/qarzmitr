@@ -1,5 +1,6 @@
 const { randomUUID } = require('crypto');
 const { db } = require('../db/database');
+const { repairDate } = require('../services/dates');
 const {
   STRUCTURE_MODEL,
   StructureServiceError,
@@ -39,7 +40,7 @@ function warning(index, field, message) {
   return { index, field, message };
 }
 
-function validateModelTransactions(modelTransactions, { ledgerId, userId }) {
+function validateModelTransactions(modelTransactions, { ledgerId, userId, today = new Date() }) {
   const transactions = [];
   const warnings = [];
 
@@ -80,18 +81,27 @@ function validateModelTransactions(modelTransactions, { ledgerId, userId }) {
       }
     }
 
+    let note = typeof modelTransaction.note === 'string'
+      ? modelTransaction.note.trim() || null
+      : null;
+
     let transactionDate = null;
     if (modelTransaction.date !== null && modelTransaction.date !== undefined) {
       if (typeof modelTransaction.date === 'string' && ISO_DATE_PATTERN.test(modelTransaction.date)) {
-        transactionDate = modelTransaction.date;
+        // A year read wrong ("26" as "86") is fixed here and flagged for the
+        // shopkeeper to confirm, rather than dated decades away.
+        const { date, repaired } = repairDate(modelTransaction.date, today);
+        transactionDate = date;
+        if (date !== modelTransaction.date) {
+          const doubt = repaired
+            ? `uncertain: date read as ${modelTransaction.date}, year assumed ${date.slice(0, 4)}`
+            : `uncertain: date read as ${modelTransaction.date} looked wrong and was left out`;
+          note = note ? `${note}; ${doubt}` : doubt;
+        }
       } else {
         warnings.push(warning(index, 'date', 'Invalid date was stored as null; expected YYYY-MM-DD.'));
       }
     }
-
-    const note = typeof modelTransaction.note === 'string'
-      ? modelTransaction.note.trim() || null
-      : null;
     if (note && note.toLowerCase().includes('uncertain')) {
       warnings.push(warning(index, 'note', note));
     }

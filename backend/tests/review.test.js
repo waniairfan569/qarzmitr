@@ -16,7 +16,8 @@ function row(overrides) {
     type: 'sale',
     amount: 500,
     customer_name: null,
-    transaction_date: '2026-09-01',
+    // Today, so the row stays a plausible recent entry whenever the tests run.
+    transaction_date: new Date().toISOString().slice(0, 10),
     note: null,
     reviewed_at: null,
     ...overrides

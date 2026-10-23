@@ -95,7 +95,8 @@ async function structureLedgerText(rawOcrText) {
           { role: 'system', content: STRUCTURE_SYSTEM_PROMPT },
           {
             role: 'user',
-            content: `Here is the raw ledger text:\n"""\n${rawOcrText}\n"""`
+            // Without today's date the model read a page's "26" as 1986.
+            content: `Today is ${new Date().toISOString().slice(0, 10)}. The ledger records recent trade, so a two-digit year such as 26 means 2026.\n\nHere is the raw ledger text:\n"""\n${rawOcrText}\n"""`
           }
         ]
       }),

@@ -12,7 +12,8 @@ initializeDatabase();
 const { parseStructuredTransactions, StructureServiceError } = require('../src/services/structure');
 const { validateModelTransactions } = require('../src/controllers/structureController');
 
-const OWNER = { ledgerId: 'ledger-1', userId: 'user-1' };
+// A fixed day, so dates in these rows stay "recent" whenever the tests run.
+const OWNER = { ledgerId: 'ledger-1', userId: 'user-1', today: new Date('2026-09-15T12:00:00Z') };
 
 function validate(rows) {
   return validateModelTransactions(rows, OWNER);
