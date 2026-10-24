@@ -1,5 +1,6 @@
 const { db } = require('../db/database');
 const { buildCustomerBalances } = require('../services/customers');
+const { buildEvidence } = require('../services/evidence');
 const { PERIODS, summariseByPeriod } = require('../services/periods');
 const { buildReminders } = require('../services/reminders');
 const { buildReadiness } = require('../services/readiness');
@@ -107,7 +108,8 @@ function getDashboard(req, res, next) {
     return res.json({
       transactions,
       latestScore,
-      scoreHistory
+      scoreHistory,
+      evidence: buildEvidence(req.userId)
     });
   } catch (error) {
     return next(error);

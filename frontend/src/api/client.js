@@ -68,15 +68,16 @@ export const api = {
     const suffix = query.toString()
     return request(`/transactions${suffix ? `?${suffix}` : ''}`, { token })
   },
-  upload: (token, file) => {
+  upload: (token, file, { force = false } = {}) => {
     const form = new FormData()
     form.append('image', file)
+    if (force) form.append('force', 'true')
     return request('/upload', { method: 'POST', token, body: form })
   },
-  structure: (token, ledgerId) => request('/structure', {
+  structure: (token, ledgerId, { force = false } = {}) => request('/structure', {
     method: 'POST',
     token,
-    body: { ledger_id: ledgerId },
+    body: force ? { ledger_id: ledgerId, force: true } : { ledger_id: ledgerId },
   }),
   score: (token) => request('/score', { method: 'POST', token }),
   loanOptions: (token, amount) => request(`/loan-options${amount ? `?amount=${encodeURIComponent(amount)}` : ''}`, { token }),

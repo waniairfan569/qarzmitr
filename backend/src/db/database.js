@@ -116,6 +116,14 @@ function initializeDatabase() {
   addColumnIfMissing('transactions', 'reviewed_at', 'TEXT');
   // 'ledger' for rows read from a photo, 'manual' for rows the shopkeeper typed.
   addColumnIfMissing('transactions', 'source', "TEXT NOT NULL DEFAULT 'ledger'");
+  // Set when a shopkeeper changes a row after it was read, so a lender can see
+  // how much of the record was altered rather than photographed as is.
+  addColumnIfMissing('transactions', 'edited_at', 'TEXT');
+  // SHA-256 of the uploaded photo, so the same picture is not counted twice.
+  addColumnIfMissing('ledgers', 'image_hash', 'TEXT');
+  // Rows held back because the page looked already added, kept so "add
+  // anyway" can save them without asking the model to read the page again.
+  addColumnIfMissing('ledgers', 'pending_json', 'TEXT');
   // Google sign-in links an account to a Google subject id; local-only accounts leave it null.
   addColumnIfMissing('users', 'google_id', 'TEXT');
   // Bumped on password reset so tokens issued before the reset stop verifying.

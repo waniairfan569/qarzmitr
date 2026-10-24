@@ -16,12 +16,19 @@ function normalizeOssRegion(region) {
   return trimmed.startsWith('oss-') ? trimmed : `oss-${trimmed}`;
 }
 
+function modelList(value, fallback) {
+  const models = String(value || '').split(',').map((model) => model.trim()).filter(Boolean);
+  return models.length ? models : [fallback];
+}
+
 const env = {
   dashscopeApiKey: process.env.DASHSCOPE_API_KEY,
   dashscopeBaseUrl: (process.env.DASHSCOPE_BASE_URL || 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1').replace(/\/+$/, ''),
-  // Any OpenAI-compatible provider works if these name its models.
-  visionModel: process.env.VISION_MODEL || 'qwen-vl-plus',
-  textModel: process.env.TEXT_MODEL || 'qwen-plus',
+  // Any OpenAI-compatible provider works if these name its models. Each may
+  // list several, comma-separated: when one is out of quota or overloaded the
+  // next is tried, and free tiers count each model's quota separately.
+  visionModels: modelList(process.env.VISION_MODEL, 'qwen-vl-plus'),
+  textModels: modelList(process.env.TEXT_MODEL, 'qwen-plus'),
   frontendOrigin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
   jwtSecret: process.env.JWT_SECRET,
   ossAccessKeyId: process.env.OSS_ACCESS_KEY_ID,
@@ -37,6 +44,7 @@ const env = {
   smtpPassword: process.env.SMTP_PASSWORD,
   smtpSecure: process.env.SMTP_SECURE === 'true',
   mailFrom: process.env.MAIL_FROM || 'QarzMitr <no-reply@qarzmitr.local>',
+  smsAccountSid: process.env.SMS_ACCOUNT_SID,
   smsApiKey: process.env.SMS_API_KEY,
   smsSender: process.env.SMS_SENDER,
   // Locally-stored ledger photos. Point this at a persistent disk in production,
@@ -57,6 +65,10 @@ function validateEnvironment() {
 function isGoogleSignInConfigured() {
   return Boolean(env.googleClientId && env.googleClientSecret && env.googleCallbackUrl);
 }
+
+// The first model in each list, for messages that name the model in use.
+env.visionModel = env.visionModels[0];
+env.textModel = env.textModels[0];
 
 module.exports = {
   env,

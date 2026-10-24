@@ -98,3 +98,17 @@ rather than being recorded as transcription failures.
 Ground truth lives in `pages.json`; per-page results are written to
 `results.json`. The benchmark creates one throwaway account and never touches
 the demo record.
+
+## Adding real ledger photos
+
+The twelve pages above are rendered, so they are an upper bound. To measure real
+handwriting:
+
+1. Put each phone photo in `benchmark/images/` as `real-01.jpg`, `real-02.jpg`, …
+2. For each, add an entry to `pages.json` with `"id": "real-01"`, a short `"why"`, and one
+   `rows` item per line on the page whose `truth` is `[type, amount, customer, "YYYY-MM-DD"]`
+   (use `null` for no customer or no usable date). Write the truth by reading the page yourself.
+3. Start the backend and run `node benchmark/run.js --only real-01,real-02`.
+
+Twenty to thirty pages from different shops and handwriting give a number worth quoting.
+

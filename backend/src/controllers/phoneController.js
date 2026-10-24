@@ -15,7 +15,7 @@ const { OAUTH_ONLY_PASSWORD, issueToken, publicUser } = require('../services/ses
 // be used to find out who has an account.
 const SENT = { message: 'If that number can receive SMS, a code is on its way.' };
 
-function requestCode(req, res, next) {
+async function requestCode(req, res, next) {
   const phone = normalizePhone(req.body?.phone);
 
   if (!phone) {
@@ -34,7 +34,10 @@ function requestCode(req, res, next) {
       VALUES (?, ?, ?, ?)
     `).run(randomUUID(), phone, hashCode(phone, code), expiryFrom());
 
-    sendOtp({ phone, code });
+    const delivery = await sendOtp({ phone, code });
+    if (delivery.status === 'failed') {
+      return res.status(502).json({ message: 'The code could not be sent right now. Try again in a minute.' });
+    }
 
     return res.json(SENT);
   } catch (error) {

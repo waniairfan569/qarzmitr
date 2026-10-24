@@ -119,7 +119,9 @@ function scorePage(page, produced) {
 
     if (want.day !== null) {
       result.dateApplicable += 1;
-      if (got.transaction_date === `2026-09-0${want.day}`) result.dateOk += 1;
+      // A day number means September 2026 (the rendered pages); real pages give a full YYYY-MM-DD.
+      const wantDate = typeof want.day === 'string' ? want.day : `2026-09-${String(want.day).padStart(2, '0')}`;
+      if (got.transaction_date === wantDate) result.dateOk += 1;
     } else {
       // An undated line must come back undated rather than carrying a guess.
       result.dateApplicable += 1;
@@ -156,8 +158,9 @@ async function main() {
   console.log(`Running ${pages.length} pages against ${BASE}\n`);
 
   for (const page of pages) {
-    const file = path.join(IMAGES, `${page.id}.png`);
-    if (!fs.existsSync(file)) {
+    // Rendered pages are .png; real phone photos added by hand are usually .jpg.
+    const file = ['png', 'jpg', 'jpeg'].map((ext) => path.join(IMAGES, `${page.id}.${ext}`)).find((candidate) => fs.existsSync(candidate));
+    if (!file) {
       console.log(`${page.id.padEnd(22)} SKIPPED (render.ps1 not run)`);
       continue;
     }
@@ -165,7 +168,11 @@ async function main() {
     process.stdout.write(`${page.id.padEnd(22)} `);
     try {
       const form = new FormData();
-      form.append('image', new Blob([fs.readFileSync(file)], { type: 'image/png' }), `${page.id}.png`);
+      const type = file.endsWith('.png') ? 'image/png' : 'image/jpeg';
+      form.append('image', new Blob([fs.readFileSync(file)], { type }), path.basename(file));
+      // Several pages share entries on purpose (the same rows faded, rotated,
+      // noisy), so the repeat-page guard is told each page is meant.
+      form.append('force', 'true');
       const upload = await api('/upload', { token, form });
 
       if (upload.ocr.status !== 'completed') {
@@ -173,7 +180,7 @@ async function main() {
         continue;
       }
 
-      const structured = await api('/structure', { token, body: { ledger_id: upload.ledger.id } });
+      const structured = await api('/structure', { token, body: { ledger_id: upload.ledger.id, force: true } });
       const score = scorePage(page, structured.transactions || []);
       rows.push({ id: page.id, why: page.why, ...score });
 

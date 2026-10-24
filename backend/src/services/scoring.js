@@ -1,5 +1,5 @@
 const { env } = require('../config/env');
-const { fetchWithRetry } = require('./modelRequest');
+const { fetchFromModels } = require('./modelRequest');
 
 const DASHSCOPE_URL = `${env.dashscopeBaseUrl}/chat/completions`;
 const SCORING_EXPLANATION_MODEL = env.textModel;
@@ -273,21 +273,21 @@ async function requestScoreExplanation(metrics) {
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetchWithRetry(DASHSCOPE_URL, {
+    const { response } = await fetchFromModels(DASHSCOPE_URL, env.textModels, (model) => ({
       method: 'POST',
       headers: {
         Authorization: `Bearer ${env.dashscopeApiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: SCORING_EXPLANATION_MODEL,
+        model,
         messages: [
           { role: 'system', content: EXPLANATION_SYSTEM_PROMPT },
           { role: 'user', content: buildExplanationUserPrompt(metrics) }
         ]
       }),
       signal: controller.signal
-    });
+    }));
 
     let responseBody;
     try {

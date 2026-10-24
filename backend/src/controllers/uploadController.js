@@ -1,4 +1,4 @@
-const { randomUUID } = require('crypto');
+const { createHash, randomUUID } = require('crypto');
 const multer = require('multer');
 const { db } = require('../db/database');
 const { OcrServiceError, extractLedgerText } = require('../services/ocr');
@@ -87,6 +87,29 @@ async function uploadLedger(req, res, next) {
       return res.status(401).json({ message: 'User account no longer exists.' });
     }
 
+    const imageHash = createHash('sha256').update(req.file.buffer).digest('hex');
+    const force = req.body?.force === 'true';
+    const previous = db.prepare(`
+      SELECT
+        id, image_url, raw_ocr_text, uploaded_at,
+        (SELECT COUNT(*) FROM transactions WHERE transactions.ledger_id = ledgers.id) AS entries
+      FROM ledgers
+      WHERE user_id = ? AND image_hash = ?
+      ORDER BY uploaded_at DESC
+      LIMIT 1
+    `).get(req.userId, imageHash);
+
+    // The very same photo again: stop before spending a model call, and let the
+    // shopkeeper add it anyway if they really mean to.
+    if (previous && previous.entries > 0 && !force) {
+      return res.status(409).json({
+        code: 'duplicate_image',
+        message: `This photo was already added on ${String(previous.uploaded_at).slice(0, 10)}. Its ${previous.entries} entries are in your records.`,
+        uploaded_at: previous.uploaded_at,
+        entries: previous.entries
+      });
+    }
+
     const ledgerId = randomUUID();
     let storedImage;
     try {
@@ -106,7 +129,10 @@ async function uploadLedger(req, res, next) {
 
     let ocrResult;
     try {
-      ocrResult = await extractLedgerText({
+      // A photo read before is not read again: same bytes, same text, no quota spent.
+      ocrResult = previous?.raw_ocr_text
+        ? { status: 'completed', text: previous.raw_ocr_text, reason: 'This photo was read before, so the earlier reading was reused.' }
+        : await extractLedgerText({
         buffer: req.file.buffer,
         mimeType
       });
@@ -119,9 +145,9 @@ async function uploadLedger(req, res, next) {
     }
 
     db.prepare(`
-      INSERT INTO ledgers (id, user_id, image_url, raw_ocr_text)
-      VALUES (?, ?, ?, ?)
-    `).run(ledgerId, req.userId, storedImage.imageUrl, ocrResult.text);
+      INSERT INTO ledgers (id, user_id, image_url, raw_ocr_text, image_hash)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(ledgerId, req.userId, storedImage.imageUrl, ocrResult.text, imageHash);
 
     const ledger = db.prepare(`
       SELECT id, user_id, image_url, raw_ocr_text, uploaded_at

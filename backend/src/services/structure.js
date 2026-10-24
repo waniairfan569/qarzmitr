@@ -1,5 +1,5 @@
 const { env } = require('../config/env');
-const { fetchWithRetry } = require('./modelRequest');
+const { fetchFromModels } = require('./modelRequest');
 
 const DASHSCOPE_URL = `${env.dashscopeBaseUrl}/chat/completions`;
 const STRUCTURE_MODEL = env.textModel;
@@ -83,14 +83,14 @@ async function structureLedgerText(rawOcrText) {
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetchWithRetry(DASHSCOPE_URL, {
+    const { response } = await fetchFromModels(DASHSCOPE_URL, env.textModels, (model) => ({
       method: 'POST',
       headers: {
         Authorization: `Bearer ${env.dashscopeApiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: STRUCTURE_MODEL,
+        model,
         messages: [
           { role: 'system', content: STRUCTURE_SYSTEM_PROMPT },
           {
@@ -101,7 +101,7 @@ async function structureLedgerText(rawOcrText) {
         ]
       }),
       signal: controller.signal
-    });
+    }));
 
     let responseBody;
     try {

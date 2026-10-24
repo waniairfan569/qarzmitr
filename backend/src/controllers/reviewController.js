@@ -121,6 +121,8 @@ function updateTransaction(req, res, next) {
     // Confirming an already-correct row is a valid action, so an empty patch is
     // allowed and simply marks the row reviewed.
     assignments.push('reviewed_at = CURRENT_TIMESTAMP');
+    // Confirming is not editing: only a real change marks the row as altered.
+    if (fields.length > 0) assignments.push('edited_at = CURRENT_TIMESTAMP');
 
     db.prepare(`UPDATE transactions SET ${assignments.join(', ')} WHERE id = ?`)
       .run(...fields.map((field) => patch[field]), id);

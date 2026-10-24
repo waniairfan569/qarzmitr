@@ -1,5 +1,6 @@
 const { createHash, randomBytes, randomUUID } = require('crypto');
 const { db } = require('../db/database');
+const { buildEvidence } = require('./evidence');
 
 const SHARE_TTL_DAYS = 7;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -103,7 +104,8 @@ function buildSharedStatement(userId) {
     owner: { name: user?.name || '', shop_name: user?.shop_name || '' },
     latestScore: scoreHistory.length ? scoreHistory[scoreHistory.length - 1] : null,
     scoreHistory,
-    transactions
+    transactions,
+    evidence: buildEvidence(userId)
   };
 }
 

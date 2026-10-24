@@ -19,6 +19,8 @@ export default function LedgerWorkflow({ onDataChanged }) {
   const [uploadResult, setUploadResult] = useState(null)
   const [structureResult, setStructureResult] = useState(null)
   const [scoreResult, setScoreResult] = useState(null)
+  // A page that looks already added: { stage: 'upload' | 'structure', message }.
+  const [duplicate, setDuplicate] = useState(null)
 
   function chooseFile(event) {
     const selected = event.target.files?.[0]
@@ -26,6 +28,7 @@ export default function LedgerWorkflow({ onDataChanged }) {
     setUploadResult(null)
     setStructureResult(null)
     setScoreResult(null)
+    setDuplicate(null)
     if (!selected) return
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(selected.type)) {
       setFile(null)
@@ -40,29 +43,39 @@ export default function LedgerWorkflow({ onDataChanged }) {
     setFile(selected)
   }
 
-  async function uploadLedger() {
+  async function uploadLedger({ force = false } = {}) {
     if (!file) return
     setBusy('upload')
     setError('')
+    setDuplicate(null)
     try {
-      const result = await api.upload(token, file)
+      const result = await api.upload(token, file, { force })
       setUploadResult(result)
     } catch (requestError) {
-      setError(requestError.message)
+      if (requestError.status === 409 && requestError.data?.code === 'duplicate_image') {
+        setDuplicate({ stage: 'upload', message: requestError.data.message })
+      } else {
+        setError(requestError.message)
+      }
     } finally {
       setBusy('')
     }
   }
 
-  async function structureLedger() {
+  async function structureLedger({ force = false } = {}) {
     setBusy('structure')
     setError('')
+    setDuplicate(null)
     try {
-      const result = await api.structure(token, uploadResult.ledger.id)
+      const result = await api.structure(token, uploadResult.ledger.id, { force })
       setStructureResult(result)
       await onDataChanged()
     } catch (requestError) {
-      setError(requestError.message)
+      if (requestError.status === 409 && requestError.data?.code === 'duplicate_entries') {
+        setDuplicate({ stage: 'structure', message: requestError.data.message })
+      } else {
+        setError(requestError.message)
+      }
     } finally {
       setBusy('')
     }
@@ -105,7 +118,7 @@ export default function LedgerWorkflow({ onDataChanged }) {
               <span className="mt-3 font-bold">{file ? file.name : t(`ledger.choose`)}</span>
               <span className="mt-1 text-xs text-ink/50">{t(`ledger.limits`)}</span>
             </button>
-            <button type="button" className="primary-button mt-4 w-full" disabled={!file || Boolean(busy)} onClick={uploadLedger}>
+            <button type="button" className="primary-button mt-4 w-full" disabled={!file || Boolean(busy)} onClick={() => uploadLedger()}>
               {busy === 'upload' ? <><LoaderCircle className="animate-spin" size={17} /> {t(`ledger.uploading`)}</> : <><ScanLine size={17} /> {t(`ledger.upload`)}</>}
             </button>
             {busy === 'upload' && <div className="progress-track mt-3"><div className="progress-bar" /></div>}
@@ -138,7 +151,7 @@ export default function LedgerWorkflow({ onDataChanged }) {
               ) : structureResult ? (
                 <p className="mt-1 text-xs text-ink/55">{structureResult.status === 'skipped' ? structureResult.message : t(`ledger.created`, { count: structureResult.count })}</p>
               ) : (
-                <button type="button" className="text-button mt-2" disabled={!ocrReady || Boolean(busy)} onClick={structureLedger}>{t(`ledger.process`)}</button>
+                <button type="button" className="text-button mt-2" disabled={!ocrReady || Boolean(busy)} onClick={() => structureLedger()}>{t(`ledger.process`)}</button>
               )}
               {structureResult?.warnings?.length > 0 && <p className="mt-2 text-xs font-bold text-saffron-dark">{t(`ledger.flagged`, { count: structureResult.warnings.length })}</p>}
             </ProcessStep>
@@ -151,6 +164,20 @@ export default function LedgerWorkflow({ onDataChanged }) {
               )}
             </ProcessStep>
           </div>
+          {duplicate && (
+            <Notice>
+              <p className="flex items-start gap-2 text-ink"><AlertCircle className="mt-1 shrink-0 text-saffron-dark" size={17} />{duplicate.message}</p>
+              <p className="mt-1 font-normal">{t(`dup.body`)}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button type="button" className="secondary-button !min-h-10 !px-4 !text-xs" disabled={Boolean(busy)} onClick={() => (duplicate.stage === 'upload' ? uploadLedger({ force: true }) : structureLedger({ force: true }))}>
+                  {t(`dup.addAnyway`)}
+                </button>
+                <button type="button" className="text-button !text-xs" onClick={() => { setDuplicate(null); setFile(null); setUploadResult(null) }}>
+                  {t(`dup.cancel`)}
+                </button>
+              </div>
+            </Notice>
+          )}
           {error && <Notice tone="error"><span className="flex items-start gap-2"><AlertCircle className="mt-0.5 shrink-0" size={17} />{error}</span></Notice>}
           {scoreResult?.score !== undefined && <Notice tone="success">Score {scoreResult.score}/100 saved. {scoreResult.explanation?.status === 'skipped' && 'Urdu explanation was skipped because the API key is not configured.'}</Notice>}
         </div>

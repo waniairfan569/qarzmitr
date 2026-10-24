@@ -61,8 +61,7 @@ function buildAssessment(transactions, latestScore, scoreHistory) {
     facility: monthlySales * band.multiple,
     delta,
     customers: new Set(transactions.map((transaction) => transaction.customer_name).filter(Boolean)).size,
-    ledgerPages: new Set(transactions.map((transaction) => transaction.ledger_id).filter(Boolean)).size,
-    manual: transactions.filter((transaction) => transaction.source === 'manual').length
+    ledgerPages: new Set(transactions.map((transaction) => transaction.ledger_id).filter(Boolean)).size
   }
 }
 
@@ -164,7 +163,6 @@ export default function StatementView({ data, owner, notice }) {
               <Row label={t(`lender.row.customers`)} value={assessment.customers} />
               <Row label={t(`lender.row.period`)} value={assessment.firstDay ? `${assessment.firstDay} → ${assessment.lastDay}` : t(`lender.undated`)} />
               <Row label={t(`lender.row.runs`)} value={data.scoreHistory.length} />
-            <Row label={t(`lender.row.manual`)} value={`${assessment.manual} / ${data.transactions.length}`} />
               <Row label={t(`lender.row.sales`)} value={pkr(assessment.sales)} />
               <Row label={t(`lender.row.expenses`)} value={pkr(assessment.expenses)} />
               <Row label={t(`lender.row.credit`)} value={pkr(assessment.creditGiven)} />
@@ -173,6 +171,8 @@ export default function StatementView({ data, owner, notice }) {
               <Row label={t(`lender.row.monthly`)} value={pkr(assessment.monthlySales)} emphasis />
             </dl>
           </section>
+
+          {data.evidence && <EvidencePanel evidence={data.evidence} />}
 
           <section className="card mt-6 p-6 md:p-8">
             <div className="section-kicker">{t(`lender.method`)}</div>
@@ -192,6 +192,44 @@ export default function StatementView({ data, owner, notice }) {
         </>
       )}
     </>
+  )
+}
+
+/**
+ * QarzMitr cannot prove a ledger is true, so it shows how the record was built
+ * and leaves the judgement to the lender: photographed pages uploaded on many
+ * days are harder to invent than entries typed in one sitting.
+ */
+function EvidencePanel({ evidence }) {
+  const t = useT()
+  const share = evidence.entries ? Math.round((evidence.photographed / evidence.entries) * 100) : 0
+  const tone = share >= 80 ? 'bg-leaf' : share >= 50 ? 'bg-saffron' : 'bg-coral'
+  const day = (value) => (value ? String(value).slice(0, 10) : '—')
+
+  return (
+    <section className="card mt-6 p-6 md:p-8">
+      <div className="section-kicker">{t(`evidence2.kicker`)}</div>
+      <h2 className="mt-2 font-display text-2xl">{t(`evidence2.title`)}</h2>
+      <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/60">{t(`evidence2.body`)}</p>
+
+      <div className="mt-5">
+        <div className="flex items-baseline justify-between gap-4 text-sm">
+          <span className="font-bold">{t(`evidence2.fromPhotos`, { share })}</span>
+          <span className="tabular-nums text-ink/55">{evidence.photographed} / {evidence.entries}</span>
+        </div>
+        <div className="progress-track mt-2">
+          <div className={`h-full rounded-full ${tone}`} style={{ width: `${share}%` }} />
+        </div>
+      </div>
+
+      <dl className="mt-5 grid gap-x-8 gap-y-0 sm:grid-cols-2">
+        <Row label={t(`evidence2.typed`)} value={evidence.typed} />
+        <Row label={t(`evidence2.edited`)} value={evidence.edited_after_reading} />
+        <Row label={t(`evidence2.pages`)} value={evidence.pages} />
+        <Row label={t(`evidence2.days`)} value={evidence.upload_days} />
+        <Row label={t(`evidence2.span`)} value={evidence.first_upload ? `${day(evidence.first_upload)} → ${day(evidence.last_upload)}` : '—'} />
+      </dl>
+    </section>
   )
 }
 

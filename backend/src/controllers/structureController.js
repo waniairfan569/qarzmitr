@@ -1,6 +1,7 @@
 const { randomUUID } = require('crypto');
 const { db } = require('../db/database');
 const { repairDate } = require('../services/dates');
+const { findDuplicates } = require('../services/duplicates');
 const {
   STRUCTURE_MODEL,
   StructureServiceError,
@@ -122,14 +123,14 @@ function validateModelTransactions(modelTransactions, { ledgerId, userId, today 
 }
 
 async function structureLedger(req, res, next) {
-  const { ledger_id: ledgerId } = req.body || {};
+  const { ledger_id: ledgerId, force } = req.body || {};
   if (typeof ledgerId !== 'string' || !ledgerId.trim()) {
     return res.status(400).json({ message: 'ledger_id is required and must be a non-empty string.' });
   }
 
   try {
     const ledger = db.prepare(`
-      SELECT id, user_id, raw_ocr_text
+      SELECT id, user_id, raw_ocr_text, pending_json
       FROM ledgers
       WHERE id = ?
     `).get(ledgerId.trim());
@@ -140,6 +141,32 @@ async function structureLedger(req, res, next) {
     if (ledger.user_id !== req.userId) {
       return res.status(403).json({ message: 'You do not have permission to structure this ledger.' });
     }
+    // Structuring the same ledger twice would count every row twice.
+    const alreadySaved = db.prepare('SELECT COUNT(*) AS n FROM transactions WHERE ledger_id = ?').get(ledger.id).n;
+    if (alreadySaved > 0) {
+      return res.status(409).json({
+        code: 'already_structured',
+        message: `This page's ${alreadySaved} entries are already in your records.`
+      });
+    }
+
+    // "Add anyway" on a page held back as a likely repeat: save the rows read
+    // the first time instead of asking the model to read the page again.
+    if (force === true && ledger.pending_json) {
+      const held = JSON.parse(ledger.pending_json);
+      insertTransactionBatch(held);
+      db.prepare('UPDATE ledgers SET pending_json = NULL WHERE id = ?').run(ledger.id);
+      return res.status(201).json({
+        message: 'Ledger transactions structured successfully.',
+        status: 'completed',
+        model: STRUCTURE_MODEL,
+        ledger_id: ledger.id,
+        count: held.length,
+        transactions: held,
+        warnings: []
+      });
+    }
+
     if (typeof ledger.raw_ocr_text !== 'string' || !ledger.raw_ocr_text.trim()) {
       return res.status(400).json({
         message: 'This ledger has no OCR text to structure. Complete OCR before structuring transactions.'
@@ -177,6 +204,23 @@ async function structureLedger(req, res, next) {
       ledgerId: ledger.id,
       userId: req.userId
     });
+
+    if (force !== true) {
+      const existing = db.prepare(`
+        SELECT type, amount, customer_name, transaction_date FROM transactions WHERE user_id = ?
+      `).all(req.userId);
+      const duplicates = findDuplicates(transactions, existing);
+      if (duplicates.isDuplicate) {
+        db.prepare('UPDATE ledgers SET pending_json = ? WHERE id = ?').run(JSON.stringify(transactions), ledger.id);
+        return res.status(409).json({
+          code: 'duplicate_entries',
+          message: `${duplicates.matched} of the ${duplicates.count} entries on this page are already in your records. It looks like this page was added before.`,
+          matched: duplicates.matched,
+          count: duplicates.count
+        });
+      }
+    }
+
     insertTransactionBatch(transactions);
 
     return res.status(201).json({
