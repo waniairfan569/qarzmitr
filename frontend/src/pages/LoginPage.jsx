@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowRight, AlertCircle, KeyRound, LoaderCircle } from 'lucide-react'
+import { ArrowRight, AlertCircle, LoaderCircle } from 'lucide-react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import AuthFrame from '../components/AuthFrame'
 import { useT } from '../i18n'
@@ -7,7 +7,6 @@ import GoogleButton from '../components/GoogleButton'
 import PhoneSignIn from '../components/PhoneSignIn'
 import { useAuth } from '../context/AuthContext'
 
-const DEMO_CREDENTIALS = { email: 'demo@qarzmitr.com', password: 'Demo1234!' }
 
 export default function LoginPage() {
   const { login, isAuthenticated } = useAuth()
@@ -21,11 +20,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
 
   if (isAuthenticated) return <Navigate to="/dashboard" replace />
-
-  function fillDemoCredentials() {
-    setForm(DEMO_CREDENTIALS)
-    setError('')
-  }
 
   async function submit(event) {
     event.preventDefault()
@@ -47,21 +41,6 @@ export default function LoginPage() {
 
   return (
     <AuthFrame eyebrow={t(`auth.welcomeBack`)} title={t(`auth.openRecord`)} subtitle="">
-      <aside className="mb-6 rounded-2xl border border-saffron/35 bg-saffron/[0.09] p-4" aria-label="Demo account credentials">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-sm font-bold text-ink"><KeyRound className="text-saffron-dark" size={17} /> {t(`auth.tryDemo`)}</div>
-            <p className="mt-1 text-xs leading-5 text-ink/55">{t(`auth.demoHint`)}</p>
-          </div>
-          <button className="shrink-0 rounded-lg border border-ink/15 bg-cream px-3 py-2 text-[11px] font-bold text-leaf transition hover:-translate-y-0.5 hover:border-leaf/40" type="button" onClick={fillDemoCredentials}>
-            {t(`auth.fillDemo`)}
-          </button>
-        </div>
-        <dl className="mt-3 grid gap-2 rounded-xl bg-ink/[0.045] p-3 text-xs sm:grid-cols-2">
-          <div><dt className="text-[9px] font-bold uppercase tracking-[0.16em] text-ink/40">Email</dt><dd className="mt-1 font-semibold text-ink">demo@qarzmitr.com</dd></div>
-          <div><dt className="text-[9px] font-bold uppercase tracking-[0.16em] text-ink/40">Password</dt><dd className="mt-1 font-semibold text-ink">Demo1234!</dd></div>
-        </dl>
-      </aside>
       <div className="mb-6 space-y-4"><GoogleButton label="Sign in with Google" /></div>
 
       <div className="mb-5 flex gap-1 rounded-full bg-ink/[0.06] p-1" role="group" aria-label={t(`phone.label`)}>
