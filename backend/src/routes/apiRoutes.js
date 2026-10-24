@@ -7,6 +7,7 @@ const {
   getSummary,
   getTransactions
 } = require('../controllers/dashboardController');
+const { resetDemo } = require('../controllers/demoController');
 const { getLoanOptions, getShares, postRevokeShare, postShare } = require('../controllers/loanController');
 const { scoreUser } = require('../controllers/scoreController');
 const { structureLedger } = require('../controllers/structureController');
@@ -32,6 +33,7 @@ router.post('/transactions', createTransaction);
 router.patch('/transactions/:id', updateTransaction);
 router.delete('/transactions/:id', deleteTransaction);
 router.get('/loan-options', getLoanOptions);
+router.post('/demo/reset', resetDemo);
 router.get('/shares', getShares);
 router.post('/shares', shareCreateLimiter, postShare);
 router.post('/shares/:id/revoke', postRevokeShare);

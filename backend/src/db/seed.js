@@ -219,4 +219,13 @@ async function main() {
   }
 }
 
-main();
+// Run from the command line (npm run seed); required elsewhere, it only exports.
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  BCRYPT_ROUNDS,
+  DEMO_USER,
+  seedDatabase
+};

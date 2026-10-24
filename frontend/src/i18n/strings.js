@@ -574,4 +574,10 @@ export const STRINGS = {
   'evidence2.pages': ['Pages photographed', 'تصویر والے صفحات'],
   'evidence2.days': ['Separate days with uploads', 'اپ لوڈ کے الگ دن'],
   'evidence2.span': ['First and latest upload', 'پہلا اور تازہ ترین اپ لوڈ'],
+  'evidence2.checks': ['Checks on this record', 'اس ریکارڈ کی جانچ'],
+  'demo.reset': ['Reset demo data', 'ڈیمو ڈیٹا دوبارہ ترتیب دیں'],
+  'demo.confirm': ['Put the demo back to its starting record?', 'ڈیمو کو شروع والے ریکارڈ پر واپس لائیں؟'],
+  'demo.yes': ['Reset', 'واپس لائیں'],
+  'demo.working': ['Resetting…', 'ترتیب دیا جا رہا ہے…'],
+  'demo.done': ['Demo reset ✓', 'ڈیمو واپس آ گیا ✓'],
 }

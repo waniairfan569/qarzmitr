@@ -1,4 +1,5 @@
 const { db } = require('../db/database');
+const { buildChecks } = require('./verification');
 
 /**
  * How much of a record a lender can lean on. QarzMitr cannot prove a ledger is
@@ -27,6 +28,19 @@ function buildEvidence(userId) {
       AND EXISTS (SELECT 1 FROM transactions WHERE transactions.ledger_id = ledgers.id)
   `).get(userId);
 
+  const records = db.prepare(`
+    SELECT ledger_id, type, amount, transaction_date, source, edited_at FROM transactions WHERE user_id = ?
+  `).all(userId);
+  const ledgerTexts = db.prepare(`
+    SELECT id, raw_ocr_text FROM ledgers
+    WHERE user_id = ? AND EXISTS (SELECT 1 FROM transactions WHERE transactions.ledger_id = ledgers.id)
+  `).all(userId);
+  const checks = buildChecks({
+    pages: ledgerTexts.map((ledger) => ({ raw_ocr_text: ledger.raw_ocr_text, rows: records.filter((row) => row.ledger_id === ledger.id) })),
+    rows: records,
+    uploadDays: pages.upload_days
+  });
+
   return {
     entries: rows.entries,
     photographed: rows.entries - rows.typed,
@@ -35,7 +49,8 @@ function buildEvidence(userId) {
     pages: pages.pages,
     upload_days: pages.upload_days,
     first_upload: pages.first_upload,
-    last_upload: pages.last_upload
+    last_upload: pages.last_upload,
+    checks
   };
 }
 

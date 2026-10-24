@@ -56,7 +56,9 @@ describe('buildEvidence', () => {
     add.run(randomUUID(), 'l2', userId, 'ledger', null);
     add.run(randomUUID(), null, userId, 'manual', null);
 
-    assert.deepEqual(buildEvidence(userId), {
+    const { checks, ...summary } = buildEvidence(userId);
+    assert.equal(checks.length, 5);
+    assert.deepEqual(summary, {
       entries: 4,
       photographed: 3,
       typed: 1,

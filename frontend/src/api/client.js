@@ -80,6 +80,7 @@ export const api = {
     body: force ? { ledger_id: ledgerId, force: true } : { ledger_id: ledgerId },
   }),
   score: (token) => request('/score', { method: 'POST', token }),
+  resetDemo: (token) => request('/demo/reset', { method: 'POST', token }),
   loanOptions: (token, amount) => request(`/loan-options${amount ? `?amount=${encodeURIComponent(amount)}` : ''}`, { token }),
   shares: (token) => request('/shares', { token }),
   createShare: (token, lenderId) => request('/shares', {

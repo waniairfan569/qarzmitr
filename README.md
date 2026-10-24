@@ -173,6 +173,7 @@ None of that helps if guessing is free, so the endpoints worth attacking are rat
 | POST | `/shares` | token | Make a 7-day statement link for one lender, only with `consent: true` |
 | GET | `/shares` | token | Links made, how often each was opened |
 | POST | `/shares/:id/revoke` | token | Withdraw a link |
+| POST | `/demo/reset` | token | Demo account only: back to its starting record |
 | GET | `/shared/:token` | — | The statement a lender opens, with customer names replaced |
 
 ---

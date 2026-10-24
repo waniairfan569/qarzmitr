@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { FileText, TrendingDown, TrendingUp } from 'lucide-react'
+import { CircleAlert, CircleCheck, FileText, Info, TrendingDown, TrendingUp } from 'lucide-react'
 import { useMoney, useT } from '../i18n'
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -200,6 +200,13 @@ export default function StatementView({ data, owner, notice }) {
  * and leaves the judgement to the lender: photographed pages uploaded on many
  * days are harder to invent than entries typed in one sitting.
  */
+// Written out in full so Tailwind can see the classes at build time.
+const CHECK_STYLE = {
+  pass: { Icon: CircleCheck, icon: 'text-leaf', box: 'bg-leaf/[0.07]' },
+  warn: { Icon: CircleAlert, icon: 'text-saffron-dark', box: 'bg-saffron/[0.12]' },
+  info: { Icon: Info, icon: 'text-ink/40', box: 'bg-ink/[0.04]' },
+}
+
 function EvidencePanel({ evidence }) {
   const t = useT()
   const share = evidence.entries ? Math.round((evidence.photographed / evidence.entries) * 100) : 0
@@ -229,6 +236,27 @@ function EvidencePanel({ evidence }) {
         <Row label={t(`evidence2.days`)} value={evidence.upload_days} />
         <Row label={t(`evidence2.span`)} value={evidence.first_upload ? `${day(evidence.first_upload)} → ${day(evidence.last_upload)}` : '—'} />
       </dl>
+
+      {evidence.checks?.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-sm font-bold">{t(`evidence2.checks`)}</h3>
+          <ul className="mt-3 grid gap-2">
+            {evidence.checks.map((check) => {
+              const style = CHECK_STYLE[check.status] || CHECK_STYLE.info
+              return (
+                <li key={check.code} className={`flex items-start gap-3 rounded-xl p-3 text-sm ${style.box}`}>
+                  <style.Icon size={17} className={`mt-0.5 shrink-0 ${style.icon}`} aria-hidden="true" />
+                  <span>
+                    <strong>{check.label}</strong>
+                    <span className="sr-only"> ({check.status})</span>
+                    <span className="block text-ink/65">{check.detail}</span>
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
     </section>
   )
 }

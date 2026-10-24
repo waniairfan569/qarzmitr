@@ -30,7 +30,7 @@ const RECORD_TABS = [
  */
 export default function DashboardPage() {
   const { section = 'home' } = useParams()
-  const { token, user, logout } = useAuth()
+  const { token, user, logout, acceptSession } = useAuth()
   const t = useT()
   const pkr = useMoney()
   const [dashboard, setDashboard] = useState(EMPTY_DASHBOARD)
@@ -53,6 +53,8 @@ export default function DashboardPage() {
   const [scoreStale, setScoreStale] = useState(false)
   const [rescoring, setRescoring] = useState(false)
   const [rescoreMessage, setRescoreMessage] = useState('')
+  const [resetState, setResetState] = useState('idle') // idle · confirming · working · done
+  const isDemo = user?.email === 'demo@qarzmitr.com'
 
   const loadDashboard = useCallback(async () => {
     setError('')
@@ -97,6 +99,19 @@ export default function DashboardPage() {
     if (range.from || range.to) await loadTransactions('', range)
     setScoreStale(true)
     setRescoreMessage('')
+  }
+
+  async function resetDemo() {
+    setResetState('working')
+    try {
+      const session = await api.resetDemo(token)
+      // The reset recreates the demo account, so its new session replaces the old one.
+      acceptSession(session)
+      setResetState('done')
+    } catch (requestError) {
+      setError(requestError.message)
+      setResetState('idle')
+    }
   }
 
   async function rescore() {
@@ -168,6 +183,19 @@ export default function DashboardPage() {
                   ? <><LoaderCircle className="animate-spin" size={15} /> {t(`dash.refreshing`)}</>
                   : <><RefreshCw size={15} /> {t(`dash.refresh`)}</>}
               </button>
+              {isDemo && (
+                resetState === 'confirming' ? (
+                  <span className="flex flex-wrap items-center gap-2 text-xs font-bold">
+                    {t(`demo.confirm`)}
+                    <button type="button" className="rounded-full bg-coral px-3 py-1.5 text-paper" onClick={resetDemo}>{t(`demo.yes`)}</button>
+                    <button type="button" className="text-button !text-xs" onClick={() => setResetState('idle')}>{t(`entry.keep`)}</button>
+                  </span>
+                ) : (
+                  <button type="button" className="text-button !text-xs" disabled={resetState === 'working'} onClick={() => setResetState('confirming')}>
+                    {resetState === 'working' ? t(`demo.working`) : resetState === 'done' ? t(`demo.done`) : t(`demo.reset`)}
+                  </button>
+                )
+              )}
               {/* Without this the button did its work in silence and looked broken. */}
               <p className="min-h-4 text-xs text-ink/45" aria-live="polite">
                 {refreshing

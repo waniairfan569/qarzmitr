@@ -66,6 +66,14 @@ function isGoogleSignInConfigured() {
   return Boolean(env.googleClientId && env.googleClientSecret && env.googleCallbackUrl);
 }
 
+// On Gemini's free tier each model has its own small daily quota, so the lite
+// models are always kept behind whatever is configured, as fallbacks.
+const GEMINI_FALLBACKS = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest'];
+if (env.dashscopeBaseUrl.includes('generativelanguage.googleapis.com')) {
+  env.visionModels = [...new Set([...env.visionModels, ...GEMINI_FALLBACKS])];
+  env.textModels = [...new Set([...env.textModels, ...GEMINI_FALLBACKS])];
+}
+
 // The first model in each list, for messages that name the model in use.
 env.visionModel = env.visionModels[0];
 env.textModel = env.textModels[0];
