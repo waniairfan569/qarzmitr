@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, ArrowLeft, Download, LoaderCircle } from 'lucide-react'
+import { AlertTriangle, ArrowLeft, Download, LoaderCircle, Send } from 'lucide-react'
 import { api } from '../api/client'
 import AppShell from '../components/AppShell'
 import StatementView from '../components/StatementView'
@@ -47,11 +47,16 @@ export default function LenderPage() {
             <ArrowLeft size={15} /> {t(`lender.back`)}
           </Link>
           {data?.latestScore && (
-            <div className="text-end">
-              <button type="button" className="primary-button !min-h-11 !px-5 !text-xs" onClick={() => window.print()}>
-                <Download size={15} /> {t(`lender.download`)}
-              </button>
-              <p className="mt-1.5 max-w-xs text-xs leading-5 text-ink/50">{t(`lender.downloadHint`)}</p>
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              <div className="flex flex-wrap gap-2">
+                <Link className="primary-button !min-h-11 !px-5 !text-xs" to="/dashboard/loans#lenders">
+                  <Send size={15} /> {t(`lender.share`)}
+                </Link>
+                <button type="button" className="secondary-button !min-h-11 !px-5 !text-xs" onClick={() => window.print()}>
+                  <Download size={15} /> {t(`lender.download`)}
+                </button>
+              </div>
+              <p className="max-w-sm text-xs leading-5 text-ink/50 sm:text-end">{t(`lender.shareHint`)}</p>
             </div>
           )}
         </div>

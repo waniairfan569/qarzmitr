@@ -560,4 +560,6 @@ export const STRINGS = {
   'rescore.updating': ['Updating…', 'تازہ ہو رہا ہے…'],
   'rescore.done': ['Score updated: {score}/100', 'اسکور تازہ ہو گیا: {score}/100'],
   'lender.row.manual': ['Entries typed by hand', 'ہاتھ سے درج اندراج'],
+  'lender.share': ['Share with a lender', 'قرض دینے والے کو بھیجیں'],
+  'lender.shareHint': ['Pick a lender, see exactly what they will get, and send them a private link that works for 7 days. Or save a PDF to hand over yourself.', 'ادارہ چنیں، دیکھیں انہیں کیا ملے گا، اور 7 دن چلنے والا نجی لنک بھیجیں۔ یا PDF محفوظ کر کے خود دیں۔'],
 }

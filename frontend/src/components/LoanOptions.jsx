@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Check, CircleCheck, CircleDashed, CircleSlash, Copy, ExternalLink, Landmark, Link2, LoaderCircle, Send, X } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
 import { api } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage, useMoney } from '../i18n'
@@ -28,6 +29,16 @@ export default function LoanOptions({ refreshKey }) {
   const [interestFreeOnly, setInterestFreeOnly] = useState(false)
   const [error, setError] = useState('')
   const [sharing, setSharing] = useState(null)
+  const { hash } = useLocation()
+  const hasData = Boolean(data?.has_score)
+
+  // Arriving from "Share with a lender", go straight to the lender cards once
+  // they exist, rather than leaving the shopkeeper at the top of the page.
+  useEffect(() => {
+    if (hash === '#lenders' && hasData) {
+      document.getElementById('lenders')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [hash, hasData])
 
   const load = useCallback(async () => {
     try {
@@ -65,7 +76,7 @@ export default function LoanOptions({ refreshKey }) {
   }
 
   return (
-    <section className="card p-6 md:p-8" aria-labelledby="loan-options-title">
+    <section id="lenders" className="card scroll-mt-32 p-6 md:p-8" aria-labelledby="loan-options-title">
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div className="max-w-2xl">
           <div className="section-kicker">{t(`loans.kicker`)}</div>
